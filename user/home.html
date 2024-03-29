@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Styles spécifiques à la barre de navigation */
+        nav {
+            background-color: #0056b3; /* Bleu foncé */
+            color: white;
+        }
+        nav input[type='search'] {
+            margin: 0.5rem;
+            padding: 0.25rem;
+            border: none;
+            max-width: 200px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        nav ul li a img {
+            vertical-align: middle;
+        }
+        .search-container {
+            background-color: white;
+            border-radius: 5px;
+            padding: 0.25rem;
+        }
+        .search-container input[type='search'] {
+            background: transparent;
+            border: none;
+            margin-left: 0.5rem;
+        }
+        .search-container input[type='search']::placeholder {
+            color: #0056b3;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>Barre de Recherche</title>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>REBOOTERS</strong></li>
+            <li class="search-container">
+                <input type="search" placeholder="Entrer un mot clé..." />
+            </li>
+            <li><a href="#" role="button"><img src="https://designergpt.replit.app/static/menu-icon.png" alt="Menu" /></a></li>
+            <li><a href="#" role="button">USER</a></li>
+        </ul>
+    </nav>
+</body>
+</html>
