@@ -19,10 +19,18 @@
     </div>
    
     <div>
-        <button class="menu-button">☰</button>
-        <button class="user-button">USER </button>
-    </div>
+       
+        <div class="user-menu">
+            <button class="menu-button">USER</button>
+          <button class="user-button">☰</button>
+          <div class="user-dropdown">
+            <a href="#settings">Paramètres</a>
+            <a href="#logout">Se déconnecter</a>
+          </div>
+        </div>
+      </div>
 </nav>
+
 
 </section>
 <div class="search-container">
@@ -51,6 +59,7 @@
 
 <!-- Votre section de résultats ici -->
  <h2>Les resultats..</h2>
+ <div class="table-container">
     <table>
         <thead>
             <tr>
@@ -93,6 +102,10 @@
             <!-- Répétez pour les autres objets -->
         </tbody>
     </table>
+</div>
+    <div class="export-button">
+        <button class="button primary">Exporter le Tableau</button>
+      </div>
 
 </body>
 </html>
