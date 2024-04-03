@@ -1,0 +1,270 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #f0f0f0; /* Couleur de fond de la page */
+  }
+  
+  nav {
+    background-color: #979797;
+    color: white;
+    padding: 1rem 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    /* Ajustez la taille du logo et les marges si nécessaire */
+  }
+  /* nav user */
+  .menu-button, .user-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white; 
+    font-size: 1.5rem;
+  }
+  .user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  padding: 12px 16px;
+  z-index: 1;
+}
+
+.user-dropdown a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.user-button:hover + .user-dropdown, .user-dropdown:hover {
+  display: block;
+}
+
+
+
+
+  .menu-button:hover, .user-button:hover {
+    opacity: 0.7;
+  }
+  /* logo */
+  .logo {
+  height: 90px;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    color: #333;
+    line-height: 1.6;
+  }
+  body {
+    background: #f4f4f4;
+  }
+
+  .container {
+    background: white;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .header {
+    padding: 20px;
+    background: #ececec;
+    text-align: center;
+    margin: -20px -20px 20px -20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"],
+  select,
+  .btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+  }
+
+  .btn {
+    background: #ffc107;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background: #e0a800;
+  }
+
+  .checkbox-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  .checkbox-group label {
+    flex: 1;
+    margin-right: 10px;
+    background: #ececec;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+  }
+  body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #f0f0f0; /* Couleur de fond de la page */
+  }
+  
+  nav {
+    background-color: #979797;
+    color: white;
+    padding: 1rem 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    /* Ajustez la taille du logo et les marges si nécessaire */
+  }
+  /* nav user */
+  .menu-button, .user-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white; 
+    font-size: 1.5rem;
+  }
+  .user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  padding: 12px 16px;
+  z-index: 1;
+}
+
+.user-dropdown a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.user-button:hover + .user-dropdown, .user-dropdown:hover {
+  display: block;
+}
+
+
+
+
+  .menu-button:hover, .user-button:hover {
+    opacity: 0.7;
+  }
+  /* logo */
+  .logo {
+  height: 90px;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    color: #333;
+    line-height: 1.6;
+  }
+  body {
+    background: #f4f4f4;
+  }
+
+  .container {
+    background: white;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .header {
+    padding: 20px;
+    background: #ececec;
+    text-align: center;
+    margin: -20px -20px 20px -20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"],
+  select,
+  .btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+  }
+
+  .btn {
+    background: #ffc107;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background: #e0a800;
+  }
+
+  .checkbox-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+
+  .checkbox-group label {
+    flex: 1;
+    margin-right: 10px;
+    background: #ececec;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+  }
