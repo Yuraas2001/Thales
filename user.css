@@ -1,9 +1,9 @@
-body, html {
-    height: 100%;
-    margin: 0;
-    background-color: #f0f0f0; /* Couleur de fond de la page */
-  }
-  
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #333;
+  line-height: 1.6;
+}
   nav {
     background-color: #979797;
     color: white;
@@ -75,19 +75,13 @@ body, html {
     padding-bottom: 20px;
     padding-top: 20px;
   }
-  .table-container {
-    
-      overflow-y: auto;
-      max-height: 300px; /* This controls how tall the table is before scrolling */
-     
-      border-radius: 8px; /* Rounded corners for the table container */
-  }
+  
   
   input[type="text"] {
     padding: 10px;
     margin-right: 10px;
     border: 2px solid #ccc;
-   
+    border-radius: 5px;
     font-size: 1.2em; /* Augmentez la taille du texte */
   }
   
@@ -95,7 +89,7 @@ body, html {
     padding: 10px;
     margin-right: 10px;
     border: 2px solid #ccc;
-   
+    border-radius: 5px;
     font-size: 1.2em; /* Augmentez la taille du texte */
   }
   .search-button, .fa-search {
@@ -104,18 +98,29 @@ body, html {
     
   }
   .search-button {
-    padding: 10px 36px;
-    background-color: #0576e0;
-    color: white;
-    border: none;
-   padding-top: 18px;
-    cursor: pointer;
-    font-size: 1.2em; /* Augmentez la taille du texte */
-  }
+    
+    border-radius: 5px;
+      height: 36px;
+      border: 1px solid #ddd;
+
+      padding: 24px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      display: inline-flex; /* Use flexbox for alignment */
+      align-items: center; /* Aligns children vertically */
+      justify-content: center; /* Centers children horizontally */
+    }
+
+    .fa-search {
+      vertical-align: middle;
+      
+    }
   .export-button {
     padding-left:  1120px;
    
     color: rgb(163, 88, 88);
+    
   }
   
   .search-button:hover {
@@ -124,9 +129,7 @@ body, html {
   }
   
   /* Pour augmenter la taille de l'icône de recherche */
-  .fa-search {
-    font-size: 1.5em; /* Ajustez comme nécessaire */
-  }  
+ 
   
   
   h2 {
@@ -134,14 +137,21 @@ body, html {
     text-align: center;
     margin: 1em 0;
   }
+  .table-container {
+    
+    overflow-y: auto;
+    max-height: 300px; /* This controls how tall the table is before scrolling */
+   
+    border-radius: 8px; /* Rounded corners for the table container */
+}
+  
   
   table {
-    
+    height: 300px;
     width: 1000px;
-    margin-top: 1em;
     margin-left: auto;  /* Centrer le tableau horizontalement */
     margin-right: auto; /* Centrer le tableau horizontalement */
-    border-collapse: collapse;
+    
   }
   
   th, td {
@@ -168,10 +178,16 @@ body, html {
     background-color: #f9f9f9;
     font-weight: bold;
   }
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #fff;
-    color: #333;
-    line-height: 1.6;
-  }
   
+  .container {
+    background: white;
+    margin: 50px auto;
+    padding: 20px;
+    padding-bottom: 80px;
+    margin-top: -8px;
+    text-align: center; /* Center the text and any inline element within the container */
+  }
+  .results-title {
+    text-align: center;
+    margin: 20px 0;
+  }
