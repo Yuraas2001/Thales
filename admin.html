@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="admin.css">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  
+ 
+     <title>Rebooters Search</title>
+</head>
+<body>
+
+<nav>
+    <div class="logo">
+        <img src="Images/logo.svg" alt="REBOOTERS Logo" height="200" > <!-- Ajustez le chemin et la taille -->
+       
+    </div>
+   
+    <div>
+       
+        <div class="user-menu">
+            <button class="menu-button">Admin</button>
+          <button class="user-button">☰</button>
+          <div class="user-dropdown">
+            <a href="#settings">Paramètres</a>
+            <a href="#logout">Se déconnecter</a>
+          </div>
+        </div>
+      </div>
+</nav>
+
+    
+
+    <script>
+        function createPassword() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            // Simple validation check
+            if(username && password) {
+                alert('Password for ' + username + ' created successfully!');
+                // Here you can add code to handle the password storage securely
+            } else {
+                alert('Please fill in all fields.');
+            }
+        }
+    </script>
+    
+    <div class="tab">
+        <button class="tablinks" onclick="openCity(event, 'London')">London</button>
+        <button class="tablinks" onclick="openCity(event, 'Paris')">Paris</button>
+        <button class="tablinks" onclick="openCity(event, 'Tokyo')">Tokyo</button>
+      </div>
+      
+      <div id="London" class="tabcontent">
+        <h1>Password Management System</h1>
+    <form id="passwordForm">
+        <label for="username">Name:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="button" onclick="createPassword()">Create Password</button>
+    </form>
+      </div>
+      
+      <div id="Paris" class="tabcontent">
+        <h3>Paris</h3>
+        <p>Paris is the capital of France.</p> 
+      </div>
+      
+      <div id="Tokyo" class="tabcontent">
+        <h3>Tokyo</h3>
+        <p>Tokyo is the capital of Japan.</p>
+      </div>
+      
+</body>
