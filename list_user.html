@@ -33,34 +33,32 @@
 <div class="menu">
     <a href="list_user.html">Listes des utilisateurs</a>
     <a href="Bp.html">Gestion des bonnes pratiques</a>
-    <a href="modifier_mot_de_passe.html">Modifier mot de passe verrouillé</a>
+    <a href="modifier.html">Modifier mot de passe verrouillé</a>
 </div>
 <div class="content">
-    <div id="add-remove" class="section">
-        <h3>Liste des Utilisateurs</h3>
-        <table>
-            <tr>
-                <th>Nom</th>
-                <th>Mot de passe</th>
-                <th>Action</th>
-            </tr>
-            <tr>
-                <td>Alice Dupont</td>
-                <td>123456</td>
-                <td><button>Modifier</button> <button>Supprimer</button></td>
-            </tr>
-            <!-- D'autres utilisateurs ici -->
-        </table>
-        <h3>Ajouter un Utilisateur</h3>
-        <form>
-            <input type="text" placeholder="Nom">
-            <input type="text" placeholder="Mot de passe">
-            <button type="submit">Ajouter</button>
-        </form>
-    </div>
+    <table>
+        <tr>
+            <th>Nom</th>
+            <th>Role</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>Jean Dupont</td>
+            <td>Administrateur</td>
+            <td><button>Modifier</button> <button>Supprimer</button></td>
+        </tr>
+        <!-- Ajouter d'autres lignes ici -->
+    </table>
+    <h3>Ajouter un Utilisateur</h3>
+    <form>
+        <input type="text" placeholder="Nom">
+        <input type="text" placeholder="Mot de passe">
+        <button type="submit">Ajouter</button>
+    </form>
+</div>
 
     <div id="set-password" class="section">
-        
+   
     </div>
 
   
