@@ -29,7 +29,6 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `BonnesPratiques` (
   `IDBonnePratique` int(11) NOT NULL,
-  `TitrePratique` text NOT NULL,
   `Description` text NOT NULL,
   `Etat` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
