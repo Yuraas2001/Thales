@@ -21,10 +21,10 @@
         <div>
            
             <div class="user-menu">
-                <button class="menu-button">USER</button>
+            <a href="./user_home.php" class="menu-button">User</a>
               <button class="user-button">☰</button>
               <div class="user-dropdown">
-                <a href="./user_bp.html">Paramètres</a>
+                <a href="./user_bp.php">Paramètres</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
               </div>
             </div>

@@ -21,10 +21,10 @@
     <div>
        
         <div class="user-menu">
-            <button class="menu-button">USER</button>
+        <a href="./user_home.php" class="menu-button">User</a> 
           <button class="user-button">☰</button>
           <div class="user-dropdown">
-            <a href="./user_bp.html">Paramètres</a>
+            <a href="./user_bp.php">Paramètres</a>
             <a href="../Database/deconnex.php">Se déconnecter</a>
           </div>
         </div>
@@ -66,9 +66,9 @@
         <thead>
             <tr>
                 <th>Programme</th>
-                <th>Colonne 2</th>
-                <th>Colonne 3</th>
-                <th>Colonne 4</th>
+                <th>Phase</th>
+                <th>Description</th>
+                <th>Mots Clés</th>
                 <th>Modification</th>
                
                 
@@ -77,62 +77,21 @@
             </tr>
         </thead>
         <tbody>
-            <tr class="highlight">
-                <td>Objet 1</td>
-                <td>La description</td>
-                <td>La description</td>
-                <td>La description</td>
-                <td>
-                  <button onclick="modifyRow(this)">Modifier</button>
-                </td>
-                
-               
-               
-            </tr>
-            <tr class="highlight">
-              <td>Objet 1</td>
-              <td>La description</td>
-              <td>La description</td>
-              <td>La description</td>
-              <td>
-                <button onclick="modifyRow(this)">Modifier</button>
-              </td>
-              
-              
-             
-          </tr>
-          <tr class="highlight">
-            <td>Objet 1</td>
-            <td>La description</td>
-            <td>La description</td>
-            <td>La description</td>
-            <td>
-              <button onclick="modifyRow(this)">Modifier</button>
-            </td>
-            <tr class="highlight">
-              <td>Objet 1</td>
-              <td>La description</td>
-              <td>La description</td>
-              <td>La description</td>
-              <td>
-                <button onclick="modifyRow(this)">Modifier</button>
-              </td>
-              
-           
-           
-        </tr>
-        <tr class="highlight">
-          <td>Objet 1</td>
-          <td>La description</td>
-          <td>La description</td>
-          <td>La description</td>
-          <td>
-            <button onclick="modifyRow(this)">Modifier</button>
-          </td>
-          
-         
-      
-            <!-- Répétez pour les autres objets -->
+        <?php
+            include("../Database/fetch_data.php");
+
+            // Loop through the results and create table rows
+            foreach ($results as $row) {
+              echo "<tr class='highlight'>";
+              echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
+              echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
+              echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
+              echo "<td>" . htmlspecialchars($row['NomMotsCles']) . "</td>";
+              echo "<td><button onclick='modifyRow(this)'>Modifier</button></td>";
+              echo "</tr>";
+            }
+          ?>
+            
         </tbody>
     </table>
 </div>
