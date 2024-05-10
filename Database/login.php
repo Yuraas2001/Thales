@@ -49,8 +49,8 @@
       
       // Check if the number of attempts has reached 3
       if ($result['NBtentative'] >= 3) {
-        // Block the user
-        $stmt = $bd->prepare("UPDATE Utilisateurs SET Bloque = 1 WHERE NomUtilisateur = :username");
+        // Block the user and reset the number of attempts
+        $stmt = $bd->prepare("UPDATE Utilisateurs SET Bloque = 1, NBtentative = 0 WHERE NomUtilisateur = :username");
         $stmt->execute([':username' => $username]);
         
         // Redirect to the login page with an error code

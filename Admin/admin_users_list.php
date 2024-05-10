@@ -8,8 +8,23 @@
     // Fetch all the results
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
     session_start();
+    $currentUsername = $_SESSION['username'];
+
+    foreach ($users as $index => $user) {
+        if ($user['NomUtilisateur'] === $currentUsername) {
+            // Remove the user from its current position
+            unset($users[$index]);
+
+            // Add the user at the beginning of the array
+            array_unshift($users, $user);
+
+            break;
+        }
+    }
+
+    $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -43,8 +58,8 @@
 <div class="content">
     <table>
         <tr>
-            <th>Nom</th>
-            <th>Role</th>
+            <th>Username</th>
+            <th>Rôle</th>
             <th>Bloqué</th>
             <th>Action</th>
         </tr>
@@ -54,30 +69,26 @@
                 <td><?php echo $user['TypeUtilisateur'] == 1 ? 'Admin' : 'User'; ?></td>
                 <td><?php echo $user['Bloque'] == 1 ? 'Oui' : ''; ?></td>
                 <td>
-                    <?php if ($usernameToModify === $user['NomUtilisateur']): ?>
-                        <form action="../Database/change_role.php" method="post">
-                            <input type="hidden" name="old_username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
-                            New Username: <input type="text" name="new_username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>"><br>
-                            New Role: <select name="new_role">
-                                <option value="0" <?php echo $user['TypeUtilisateur'] == 0 ? 'selected' : ''; ?>>User</option>
-                                <option value="1" <?php echo $user['TypeUtilisateur'] == 1 ? 'selected' : ''; ?>>Admin</option>
-                            </select><br>
-                            <button type="submit">Submit Changes</button>
-                        </form>
+                    <?php if ($usernameToModify === $user['NomUtilisateur'] && $currentUsername !== $user['NomUtilisateur']): ?>
+                        <!-- Change role form -->
                     <?php else: ?>
-                        <a href="?modify=<?php echo urlencode($user['NomUtilisateur']); ?>">Modifier</a>
-                        <?php if ($_SESSION['username'] !== $user['NomUtilisateur']): ?>
+                        <?php if ($currentUsername !== $user['NomUtilisateur']): ?>
+                            <a href="?modify=<?php echo urlencode($user['NomUtilisateur']); ?>">Modifier</a>
+                            <?php if ($user['Bloque'] == 1): ?>
+                                <?php if (isset($_GET['unblock']) && $_GET['unblock'] === $user['NomUtilisateur']): ?>
+                                    <form action="../Database/unblock_user.php" method="POST">
+                                        <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
+                                        New Password: <input type="password" name="new_password">
+                                        <button type="submit">Submit</button>
+                                    </form>
+                                <?php else: ?>
+                                    <a href="?unblock=<?php echo urlencode($user['NomUtilisateur']); ?>">Débloquer</a>
+                                <?php endif; ?>
+                            <?php endif; ?>
                             <form action="../Database/delete_user.php" method="POST">
                                 <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
                                 <button type="submit">Delete</button>
-                            
                             </form>
-                            <?php if ($user['Bloque'] == 1): ?>
-                                <form action="../Database/unblock_user.php" method="POST">
-                                     <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
-                                    <button type="submit">Débloquer</button>
-                                 </form>
-                             <?php endif; ?>
                         <?php endif; ?>
                     <?php endif; ?>
                 </td>
