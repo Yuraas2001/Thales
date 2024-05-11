@@ -34,7 +34,7 @@
 <div class="menu">
   <a href="admin_listes_user.html">Listes des utilisateurs</a>
   <a href="admin_bp.html">Gestion des bonnes pratiques</a>
-  <a href="admin_user_banned.html">Modifier mot de passe verrouillé</a>
+ 
 </div>
 </section>
 <div class="search-container">
@@ -74,10 +74,10 @@
                 <th>Colonne 3</th>
                 <th>Colonne 4</th>
                 <th>Modification</th>
-               
-                
-               
-               
+                <th>Etat</th>
+                <th>Action</th>
+
+
             </tr>
         </thead>
         <tbody>
@@ -89,7 +89,8 @@
                 <td>
                   <button onclick="modifyRow(this)">Modifier</button>
                 </td>
-                
+                <td class="etat non-supprimee">Non Supprimée</td>
+              <td><button class="btn-suppression">Proposer Suppression</button></td>
                
                
             </tr>
@@ -101,6 +102,8 @@
               <td>
                 <button onclick="modifyRow(this)">Modifier</button>
               </td>
+              <td class="etat proposee">Suppression Proposée</td>
+              <td><button class="btn-suppression">Annuler Proposée</button></td>
               
               
              
@@ -113,6 +116,8 @@
             <td>
               <button onclick="modifyRow(this)">Modifier</button>
             </td>
+            <td class="etat supprimee">Supprimée</td>
+            <td><button class="btn-suppression" disabled>Supprimée</button></td>
             <tr class="highlight">
               <td>Objet 1</td>
               <td>La description</td>
@@ -121,6 +126,8 @@
               <td>
                 <button onclick="modifyRow(this)">Modifier</button>
               </td>
+              <td class="etat non-supprimee">Non Supprimée</td>
+              <td><button class="btn-suppression">Proposer Suppression</button></td>
               
            
            
@@ -133,13 +140,22 @@
           <td>
             <button onclick="modifyRow(this)">Modifier</button>
           </td>
+          <td class="etat non-supprimee">Non Supprimée</td>
+              <td><button class="btn-suppression">Proposer Suppression</button></td>
           
          
       
             <!-- Répétez pour les autres objets -->
         </tbody>
     </table>
+   
+    
 </div>
+<section class="export"
+<div class="export-button">
+  <button class="button primary">Exporter le Tableau</button>
+</div>
+
 </body>
 </html>
       

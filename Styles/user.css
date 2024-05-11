@@ -191,3 +191,10 @@ body {
     text-align: center;
     margin: 20px 0;
   }
+  button {
+    cursor: pointer;
+    padding: 5px 10px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+  }

@@ -106,10 +106,11 @@ body, html {
     border-radius: 5px;
     border: 1px solid #ddd;
     box-sizing: border-box;
+    border: none;
   }
 
   .btn {
-    background: #ffc107;
+    background-color: #4CAF50;
     color: white;
     border: none;
     cursor: pointer;
@@ -117,7 +118,7 @@ body, html {
   }
 
   .btn:hover {
-    background: #e0a800;
+    background-color: #4CAF50;
   }
 
   .checkbox-group {

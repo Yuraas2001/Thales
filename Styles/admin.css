@@ -123,6 +123,7 @@ body {
     color: white;
     text-decoration: none;
     font-size: 16px;
+    padding: 20px 120px;
 }
 
 .menu a:hover {
@@ -156,4 +157,33 @@ button {
   border: none;
   background-color: #4CAF50;
   color: white;
+}
+.non-supprimee {
+  color: green;
+}
+
+.proposee {
+  color: orange;
+}
+
+.supprimee {
+  color: red;
+}
+
+.btn-suppression {
+  padding: 5px 10px;
+  color: white;
+  background-color: blue;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-suppression:disabled {
+  background-color: grey;
+  cursor: default;
+}
+
+.btn-suppression:hover:not(:disabled) {
+  background-color: darkblue;
 }
