@@ -12,20 +12,20 @@
      <title>Rebooters Search</title>
 </head>
 <body>
-
+  <!-- Logo navigation -->
 <nav>
     <div class="logo">
-        <img src="Images/logo.svg" alt="REBOOTERS Logo" height="200" > <!-- Ajustez le chemin et la taille -->
+        <img src="/Images/logo.svg" alt="REBOOTERS Logo" height="200" > 
        
     </div>
    
     <div>
-       
+        <!-- menu navigation -->
         <div class="user-menu">
             <button class="menu-button">Admin</button>
           <button class="user-button">☰</button>
           <div class="user-dropdown">
-            <a href="#settings">Paramètres</a>
+        
             <a href="#logout">Se déconnecter</a>
           </div>
         </div>
@@ -38,9 +38,10 @@
 </div>
 </section>
 <div class="search-container">
- 
+  <!-- Tableaux des bonnes pratiques-->
   <input type="text" placeholder="Entrer un mot clé...">
   <select>
+    
     <form action="/chemin-vers-votre-serveur-de-recherche" method="get">
       <option value="option1">Programme</option>
       <option value="option2">Prog_1</option>
@@ -61,7 +62,7 @@
 </form>   
 </section>
 
-<!-- Votre section de résultats ici -->
+
  
  <div class="container">
   <h2 class="results-title">Résultats</h2>
@@ -103,7 +104,8 @@
                 <button onclick="modifyRow(this)">Modifier</button>
               </td>
               <td class="etat proposee">Suppression Proposée</td>
-              <td><button class="btn-suppression">Annuler Proposée</button></td>
+              <td><button class="btn-suppression">Annuler </button></td>
+              <td><button class="btn-suppression">Appliquer </button></td>
               
               
              
@@ -145,7 +147,7 @@
           
          
       
-            <!-- Répétez pour les autres objets -->
+          
         </tbody>
     </table>
    
@@ -155,6 +157,7 @@
 <div class="export-button">
   <button class="button primary">Exporter le Tableau</button>
 </div>
+
 
 </body>
 </html>
