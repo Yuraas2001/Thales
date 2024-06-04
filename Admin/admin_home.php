@@ -6,7 +6,15 @@
   <link rel="stylesheet" href="/Styles/admin.css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
-  
+  <?php
+include 'functions.php';
+
+// Example of using the logger function
+$logMessage = "Administrator accessed the home page.";
+logger($logMessage, 'info');
+
+// Your existing code here
+?>
  
      <title>Rebooters Search</title>
 </head>

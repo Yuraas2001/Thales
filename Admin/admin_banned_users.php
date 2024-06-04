@@ -6,7 +6,16 @@
   <link rel="stylesheet" href="user.css">
   <link rel="stylesheet" href="/Styles/admin.css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  
+  <?php
+include 'functions.php';
+
+// Example of using the logger function
+$logMessage = "A banned user attempted to access.";
+logger($logMessage, 'alarm');
+
+// Your existing code here
+?>
+
   
  
      <title>Rebooters Search</title>

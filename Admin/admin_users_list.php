@@ -1,31 +1,41 @@
 <?php
-    include("../Database/base.php");
+include("../Database/base.php");
 
-    // Prepare and execute the SQL statement
-    $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
-    $stmt->execute();
+// Récupérer les informations de session
+session_start();
+$currentUsername = isset($_SESSION['username']) ? $_SESSION['username'] : 'Unknown User';
+$currentProfile = isset($_SESSION['profile']) ? $_SESSION['profile'] : 'Unknown Profile';
 
-    // Fetch all the results
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Prepare and execute the SQL statement
+$stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
+$stmt->execute();
 
-    session_start();
-    $currentUsername = $_SESSION['username'];
+// Fetch all the results
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($users as $index => $user) {
-        if ($user['NomUtilisateur'] === $currentUsername) {
-            // Remove the user from its current position
-            unset($users[$index]);
+foreach ($users as $index => $user) {
+    if ($user['NomUtilisateur'] === $currentUsername) {
+        // Remove the user from its current position
+        unset($users[$index]);
 
-            // Add the user at the beginning of the array
-            array_unshift($users, $user);
+        // Add the user at the beginning of the array
+        array_unshift($users, $user);
 
-            break;
-        }
+        break;
     }
+}
 
-    $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
-
+$usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 ?>
+
+<?php
+include 'functions.php';
+
+// Example of using the logger function with user information
+$logMessage = "User list viewed by $currentUsername ($currentProfile)";
+logger($logMessage, 'info', $currentUsername, $currentProfile);
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -107,7 +117,8 @@
                                 <?php else: ?>
                                     <a href="?unblock=<?php echo urlencode($user['NomUtilisateur']); ?>">Débloquer</a>
                                 <?php endif; ?>
-                            <?php endif; ?>
+                            <?php endif;
+                        ?>
                             <!-- The Delete button -->
                             <form action="../Database/delete_user.php" method="POST" onsubmit="return confirm('Are you sure ?');">
                                 <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
