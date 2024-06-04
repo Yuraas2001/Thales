@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="/Styles/admin.css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
   
@@ -21,19 +21,17 @@
     <div>
        
         <div class="user-menu">
-            <button class="menu-button">Admin</button>
-          <button class="user-button">☰</button>
+        <a href="./admin_home.php" class="menu-button">Admin</a> <button class="user-button">☰</button>
           <div class="user-dropdown">
-            <a href="#settings">Paramètres</a>
-            <a href="#logout">Se déconnecter</a>
+            <a href="../Database/deconnex.php">Se déconnecter</a>
           </div>
         </div>
       </div>
 </nav>
 <div class="menu">
-    <a href="list_user.html">Listes des utilisateurs</a>
-    <a href="Bp.html">Gestion des bonnes pratiques</a>
-    <a href="modifier_mot_de_passe.html">Modifier mot de passe verrouillé</a>
+    <a href="admin_users_list.php">Listes des utilisateurs</a>
+    <a href="admin_bp.php">Gestion des bonnes pratiques</a>
+    <a href="admin_banned_users.php">Modifier mot de passe verrouillé</a>
 </div>
 <div class="content">
     <div id="add-remove" class="section">

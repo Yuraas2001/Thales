@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:8889
--- Generation Time: Apr 22, 2024 at 03:50 PM
--- Server version: 5.7.39
--- PHP Version: 8.2.0
+-- Host: localhost
+-- Generation Time: May 28, 2024 at 02:54 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,10 +29,19 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `BonnesPratiques` (
   `IDBonnePratique` int(11) NOT NULL,
-  `TitrePratique` text NOT NULL,
   `Description` text NOT NULL,
-  `Etat` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `Etat` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `BonnesPratiques`
+--
+
+INSERT INTO `BonnesPratiques` (`IDBonnePratique`, `Description`, `Etat`) VALUES
+(7, 'test', 0),
+(8, 'pcamf', 0),
+(9, 'qdqsd', 0),
+(10, 'p', 0);
 
 -- --------------------------------------------------------
 
@@ -43,7 +52,17 @@ CREATE TABLE `BonnesPratiques` (
 CREATE TABLE `MotsCles` (
   `IDMotsCles` int(11) NOT NULL,
   `NomMotsCles` varchar(60) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `MotsCles`
+--
+
+INSERT INTO `MotsCles` (`IDMotsCles`, `NomMotsCles`) VALUES
+(5, 'test'),
+(6, 'pcam'),
+(7, 'qdqddq'),
+(8, 'p');
 
 -- --------------------------------------------------------
 
@@ -53,8 +72,8 @@ CREATE TABLE `MotsCles` (
 
 CREATE TABLE `Phases` (
   `IDPhase` int(11) NOT NULL,
-  `NomPhase` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `NomPhase` enum('Codage','Analyse','Execution','Preparation') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -65,7 +84,17 @@ CREATE TABLE `Phases` (
 CREATE TABLE `PratiqueMotsCles` (
   `IDBonnePratique` int(11) NOT NULL,
   `IDMotsCles` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `PratiqueMotsCles`
+--
+
+INSERT INTO `PratiqueMotsCles` (`IDBonnePratique`, `IDMotsCles`) VALUES
+(7, 5),
+(8, 6),
+(9, 7),
+(10, 8);
 
 -- --------------------------------------------------------
 
@@ -76,7 +105,7 @@ CREATE TABLE `PratiqueMotsCles` (
 CREATE TABLE `PratiquePhases` (
   `IDBonnePratique` int(11) NOT NULL,
   `IDPhase` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -87,7 +116,7 @@ CREATE TABLE `PratiquePhases` (
 CREATE TABLE `PratiqueProg` (
   `IDProgramme` int(11) NOT NULL,
   `IDBonnePratique` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -97,8 +126,8 @@ CREATE TABLE `PratiqueProg` (
 
 CREATE TABLE `Programmes` (
   `IDProgramme` int(11) NOT NULL,
-  `NomProgramme` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `NomProgramme` enum('GENERIC','PROG_1','PROG_2','PROG_3') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -110,10 +139,19 @@ CREATE TABLE `Utilisateurs` (
   `IDUtilisateur` int(11) NOT NULL,
   `NomUtilisateur` varchar(60) NOT NULL,
   `MotDePasse` varchar(255) NOT NULL,
-  `TypeUtilisateur` tinyint(1) NOT NULL DEFAULT '0',
-  `NBtentative` tinyint(3) NOT NULL DEFAULT '0',
-  `Bloque` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `TypeUtilisateur` tinyint(1) NOT NULL DEFAULT 0,
+  `NBtentative` tinyint(3) NOT NULL DEFAULT 0,
+  `Bloque` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `Utilisateurs`
+--
+
+INSERT INTO `Utilisateurs` (`IDUtilisateur`, `NomUtilisateur`, `MotDePasse`, `TypeUtilisateur`, `NBtentative`, `Bloque`) VALUES
+(10, 'nasser', 'nasser', 1, 0, 0),
+(11, 'admin', 'admin', 1, 0, 0),
+(12, 'khawla', 'khawla', 0, 0, 0);
 
 --
 -- Indexes for dumped tables
@@ -178,31 +216,31 @@ ALTER TABLE `Utilisateurs`
 -- AUTO_INCREMENT for table `BonnesPratiques`
 --
 ALTER TABLE `BonnesPratiques`
-  MODIFY `IDBonnePratique` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `IDBonnePratique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `MotsCles`
 --
 ALTER TABLE `MotsCles`
-  MODIFY `IDMotsCles` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `IDMotsCles` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `Phases`
 --
 ALTER TABLE `Phases`
-  MODIFY `IDPhase` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `IDPhase` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `Programmes`
 --
 ALTER TABLE `Programmes`
-  MODIFY `IDProgramme` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `IDProgramme` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `Utilisateurs`
 --
 ALTER TABLE `Utilisateurs`
-  MODIFY `IDUtilisateur` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `IDUtilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables
