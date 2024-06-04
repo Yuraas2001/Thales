@@ -62,16 +62,16 @@
 
 <!-- Votre section de résultats ici -->
  
- <div class="container">
+<div class="container">
   <h2 class="results-title">Résultats</h2>
  <div class="table-container">
     <table>
         <thead>
             <tr>
                 <th>Programme</th>
-                <th>Colonne 2</th>
-                <th>Colonne 3</th>
-                <th>Colonne 4</th>
+                <th>Phase</th>
+                <th>Description</th>
+                <th>Mots Clés</th>
                 <th>Modification</th>
                
                 
@@ -80,65 +80,67 @@
             </tr>
         </thead>
         <tbody>
-            <tr class="highlight">
-                <td>Objet 1</td>
-                <td>La description</td>
-                <td>La description</td>
-                <td>La description</td>
-                <td>
-                  <button onclick="modifyRow(this)">Modifier</button>
-                </td>
-                
-               
-               
-            </tr>
-            <tr class="highlight">
-              <td>Objet 1</td>
-              <td>La description</td>
-              <td>La description</td>
-              <td>La description</td>
-              <td>
-                <button onclick="modifyRow(this)">Modifier</button>
-              </td>
-              
-              
-             
-          </tr>
-          <tr class="highlight">
-            <td>Objet 1</td>
-            <td>La description</td>
-            <td>La description</td>
-            <td>La description</td>
-            <td>
-              <button onclick="modifyRow(this)">Modifier</button>
-            </td>
-            <tr class="highlight">
-              <td>Objet 1</td>
-              <td>La description</td>
-              <td>La description</td>
-              <td>La description</td>
-              <td>
-                <button onclick="modifyRow(this)">Modifier</button>
-              </td>
-              
-           
-           
-        </tr>
-        <tr class="highlight">
-          <td>Objet 1</td>
-          <td>La description</td>
-          <td>La description</td>
-          <td>La description</td>
-          <td>
-            <button onclick="modifyRow(this)">Modifier</button>
-          </td>
-          
-         
-      
-            <!-- Répétez pour les autres objets -->
+        <?php
+        include("../Database/base.php");
+
+        // Préparez la requête SQL
+        $stmt = $bd->prepare("
+          SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
+          FROM PratiqueProg
+          INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+          INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
+          INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
+          INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
+          INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+          INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique
+        ");
+
+        // Exécutez la requête
+        $stmt->execute();
+
+        // Récupérez les résultats
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Regroupez les résultats par bonne pratique
+        // Regroupez les résultats par bonne pratique, programme et mot clé
+        $groupedResults = [];
+        foreach ($results as $row) {
+          $id = $row['IDBonnePratique'];
+          $program = $row['NomProgramme'];
+          $keyword = $row['NomMotsCles'];
+
+          if (!isset($groupedResults[$id])) {
+            $groupedResults[$id] = $row;
+            $groupedResults[$id]['NomProgramme'] = [$program];
+            $groupedResults[$id]['NomMotsCles'] = [$keyword];
+          } else {
+            if (!in_array($program, $groupedResults[$id]['NomProgramme'])) {
+              $groupedResults[$id]['NomProgramme'][] = $program;
+            }
+            if (!in_array($keyword, $groupedResults[$id]['NomMotsCles'])) {
+              $groupedResults[$id]['NomMotsCles'][] = $keyword;
+            }
+          }
+        }
+
+        // Parcourez les résultats groupés et créez des lignes de tableau
+        foreach ($groupedResults as $row) {
+          echo "<tr>";
+          echo "<td>" . htmlspecialchars(implode(", ", $row['NomProgramme'])) . "</td>";
+          echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
+          echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
+          echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
+          echo "<td><button onclick='modifyRow(this)'>Modifier</button></td>";
+          echo "</tr>";
+        }
+        ?>
         </tbody>
     </table>
 </div>
+</div>
+    <div class="export-button">
+        <button class="button primary">Exporter le Tableau</button>
+      </div>
 </body>
 </html>
       
