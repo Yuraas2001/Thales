@@ -99,14 +99,24 @@
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Regroupez les résultats par bonne pratique
+        // Regroupez les résultats par bonne pratique, programme et mot clé
         $groupedResults = [];
         foreach ($results as $row) {
           $id = $row['IDBonnePratique'];
+          $program = $row['NomProgramme'];
+          $keyword = $row['NomMotsCles'];
+
           if (!isset($groupedResults[$id])) {
             $groupedResults[$id] = $row;
-            $groupedResults[$id]['NomProgramme'] = [$row['NomProgramme']];
+            $groupedResults[$id]['NomProgramme'] = [$program];
+            $groupedResults[$id]['NomMotsCles'] = [$keyword];
           } else {
-            $groupedResults[$id]['NomProgramme'][] = $row['NomProgramme'];
+            if (!in_array($program, $groupedResults[$id]['NomProgramme'])) {
+              $groupedResults[$id]['NomProgramme'][] = $program;
+            }
+            if (!in_array($keyword, $groupedResults[$id]['NomMotsCles'])) {
+              $groupedResults[$id]['NomMotsCles'][] = $keyword;
+            }
           }
         }
 
@@ -116,7 +126,7 @@
           echo "<td>" . htmlspecialchars(implode(", ", $row['NomProgramme'])) . "</td>";
           echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
           echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
-          echo "<td>" . htmlspecialchars($row['NomMotsCles']) . "</td>";
+          echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
           echo "<td><button onclick='modifyRow(this)'>Modifier</button></td>";
           echo "</tr>";
         }

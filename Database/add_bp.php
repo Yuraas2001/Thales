@@ -4,7 +4,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Get the form data
     $goodPractice = $_POST['good-practice'];
-    $keyword = $_POST['keyword'];
+    $keywords = explode(',', $_POST['keyword']); // Split the keywords into an array
     $programs = $_POST['program']; //this will be an array
     $phase = $_POST['phase'];
 
@@ -24,22 +24,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lastId = $bd->lastInsertId();
 
     // Insert the keyword
-    $stmt = $bd->prepare("
-        INSERT INTO MotsCles (NomMotsCles)
-        VALUES (:keyword)
-    ");
-    $stmt->bindParam(':keyword', $keyword);
-    $stmt->execute();
+    foreach ($keywords as $keyword) {
+        $keyword = trim($keyword); // Remove any whitespace
 
-    $keywordId = $bd->lastInsertId();
+        $stmt = $bd->prepare("
+            INSERT INTO MotsCles (NomMotsCles)
+            VALUES (:keyword)
+        ");
+        $stmt->bindParam(':keyword', $keyword);
+        $stmt->execute();
 
-    $stmt = $bd->prepare("
-        INSERT INTO PratiqueMotsCles (IDBonnePratique, IDMotsCles)
-        VALUES (:lastId, :keywordId)
-    ");
-    $stmt->bindParam(':lastId', $lastId);
-    $stmt->bindParam(':keywordId', $keywordId);
-    $stmt->execute();
+        $keywordId = $bd->lastInsertId();
+
+        $stmt = $bd->prepare("
+            INSERT INTO PratiqueMotsCles (IDBonnePratique, IDMotsCles)
+            VALUES (:lastId, :keywordId)
+        ");
+        $stmt->bindParam(':lastId', $lastId);
+        $stmt->bindParam(':keywordId', $keywordId);
+        $stmt->execute();
+    }
 
     // Insert the phase
     $stmt = $bd->prepare("
