@@ -16,12 +16,12 @@
   if ($result) {
     // Check if the user is blocked
     if ($result['Bloque'] == 1) {
-      header('Location: http://localhost:5500/index.php?err=2');
+      header('Location: http://localhost/index.php?err=2');
       exit;
     }
 
     // Check if the password is correct
-    if ($result['MotDePasse'] == $password) {
+    if (password_verify($password, $result['MotDePasse'])) {
       // Reset the number of attempts
       $stmt = $bd->prepare("UPDATE Utilisateurs SET NBtentative = 0 WHERE NomUtilisateur = :username");
       $stmt->execute([':username' => $username]);
@@ -54,15 +54,15 @@
         $stmt->execute([':username' => $username]);
         
         // Redirect to the login page with an error code
-        header('Location: http://localhost:5500/index.php?err=2');
+        header('Location: http://localhost/index.php?err=2');
         exit;
       }
 
-      header('Location: http://localhost:5500/index.php?err=1');
+      header('Location: http://localhost/index.php?err=1');
       exit;
     }
   } else {
-    header('Location: http://localhost:5500/index.php?err=1');
+    header('Location: http://localhost/index.php?err=1');
     exit;
   }
 ?>

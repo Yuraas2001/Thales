@@ -1,4 +1,5 @@
 <?php
+    session_start();
     include("../Database/base.php");
 
     // Prepare and execute the SQL statement
@@ -8,7 +9,6 @@
     // Fetch all the results
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    session_start();
     $currentUsername = $_SESSION['username'];
 
     foreach ($users as $index => $user) {
@@ -51,7 +51,19 @@
     </div>
 </nav>
 
+<style>
+.error {
+    color: red;
+}
+</style>
 <div class="content">
+<?php
+    if (isset($_SESSION['error'])) {
+        echo "<p class='error'>" . $_SESSION['error'] . "</p>";
+        unset($_SESSION['error']);
+    }
+    ?>
+
     <h3>Ajouter un utilisateur</h3>
     <form action="../Database/add_user.php" method="post">
         <label for="username">Username:</label>
@@ -68,6 +80,7 @@
 
         <button type="submit"> Add User </button>
     </form>
+
 </div>
 <div class="menu">
     <a href="admin_users_list.php">Listes des utilisateurs</a>
@@ -117,12 +130,26 @@
                     ?>
                         <?php if ($user['Bloque'] == 1): ?>
                                 <?php if (isset($_GET['unblock']) && $_GET['unblock'] === $user['NomUtilisateur']): ?>
-                                   <!-- Unblock User form -->
-                                    <form action="../Database/unblock_user.php" method="POST">
-                                        <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
-                                        New Password: <input type="password" name="new_password">
-                                        <button type="submit">Submit</button>
-                                    </form>
+                                <!-- Unblock User form -->
+                                <form action="../Database/unblock_user.php" method="POST">
+                                    <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
+                                    New Password: <input type="password" name="new_password">
+                                    <button type="submit">Submit</button>
+                                    <?php
+                                    // Start the session if it's not already started
+                                    if (session_status() == PHP_SESSION_NONE) {
+                                        session_start();
+                                    }
+
+                                    // Check if there's an error message and display it
+                                    if (isset($_SESSION['error'])) {
+                                        echo '<p style="color: red;">' . $_SESSION['error'] . '</p>';
+
+                                        // Unset the error message so it doesn't persist
+                                        unset($_SESSION['error']);
+                                    }
+                                    ?>
+                                </form>
                                 <?php else: ?>
                                     <a href="?unblock=<?php echo urlencode($user['NomUtilisateur']); ?>">Débloquer</a>
                                 <?php endif; ?>
