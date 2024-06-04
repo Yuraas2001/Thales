@@ -16,7 +16,7 @@
   if ($result) {
     // Check if the user is blocked
     if ($result['Bloque'] == 1) {
-      header('Location: http://localhost:5500/index.php?err=2');
+      header('Location: http://localhost/index.php?err=2');
       exit;
     }
 
@@ -54,15 +54,15 @@
         $stmt->execute([':username' => $username]);
         
         // Redirect to the login page with an error code
-        header('Location: http://localhost:5500/index.php?err=2');
+        header('Location: http://localhost/index.php?err=2');
         exit;
       }
 
-      header('Location: http://localhost:5500/index.php?err=1');
+      header('Location: http://localhost/index.php?err=1');
       exit;
     }
   } else {
-    header('Location: http://localhost:5500/index.php?err=1');
+    header('Location: http://localhost/index.php?err=1');
     exit;
   }
 ?>
