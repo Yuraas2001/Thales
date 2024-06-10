@@ -109,7 +109,7 @@ body, html {
   }
 
   .btn {
-    background: #ffc107;
+    background: #007BFF;
     color: white;
     border: none;
     cursor: pointer;
@@ -117,7 +117,7 @@ body, html {
   }
 
   .btn:hover {
-    background: #e0a800;
+    background: #007BFF;
   }
 
   .checkbox-group {

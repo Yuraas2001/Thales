@@ -46,7 +46,7 @@ $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Requête SQL pour les bonnes pratiques
 $stmt = $bd->prepare("
-  SELECT bp.IDBonnePratique, p.NomProgramme, ph.NomPhase, bp.Description, mc.NomMotsCles, bp.Etat
+  SELECT bp.IDBonnePratique, p.NomProgramme, ph.NomPhase, bp.Description, mc.NomMotsCles, bp.is_deleted
   FROM PratiqueProg pp
   INNER JOIN Programmes p ON pp.IDProgramme = p.IDProgramme
   INNER JOIN PratiquePhases pp2 ON pp.IDBonnePratique = pp2.IDBonnePratique
@@ -94,7 +94,7 @@ foreach ($results as $row) {
 
 <nav>
     <div class="logo">
-        <img src="/Images/logo.svg" alt="REBOOTERS Logo" height="200">
+        <img src="Images/logo.svg" alt="REBOOTERS Logo" height="200">
     </div>
     <div>
         <div class="user-menu">
@@ -107,13 +107,11 @@ foreach ($results as $row) {
     </div>
 </nav>
 <div class="menu">
-  <a href="admin_users_list.php">Listes des utilisateurs</a>
-  <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-  <a href="admin_editprog.php">Modifier un programme</a>
+  <a href="superadmin_users_list.php">Listes des utilisateurs</a>
+  <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
+  <a href="superadmin_editprog.php">Modifier un programme</a>
 </div>
 </section>
-<div class="container">
-    <div class="header">
 <div class="program-management">
     <h2>Gestion des Programmes</h2>
     <form method="post">
@@ -134,8 +132,6 @@ foreach ($results as $row) {
       <?php endforeach; ?>
     </ul>
   </div>
-</div>
-</div>
 </div>
 
 

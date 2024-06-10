@@ -123,6 +123,7 @@ body {
     color: white;
     text-decoration: none;
     font-size: 16px;
+
 }
 
 .menu a:hover {
@@ -149,11 +150,12 @@ body {
 }
 .menu {
   padding-left: 300px;
+  margin-left: 95px;
 }
 button {
   cursor: pointer;
   padding: 5px 10px;
   border: none;
-  background-color: #4CAF50;
+  background-color: #007BFF;
   color: white;
 }

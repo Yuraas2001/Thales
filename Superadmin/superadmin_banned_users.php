@@ -59,9 +59,9 @@
       </div>
 </nav>
 <div class="menu">
-  <a href="admin_users_list.php">Listes des utilisateurs</a>
-  <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-  <a href="admin_editprog.php">Modifier ue programme</a>
+  <a href="superadmin_users_list.php">Listes des utilisateurs</a>
+  <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
+  <a href="superadmin_editprog.php">Modifier un programme</a>
 </div>
 </section>
 <div class="search-container">
