@@ -111,34 +111,30 @@ foreach ($results as $row) {
   <a href="admin_bp.php">Gestion des bonnes pratiques</a>
   <a href="admin_editprog.php">Modifier un programme</a>
 </div>
-</section>
 <div class="container">
     <div class="header">
-<div class="program-management">
-    <h2>Gestion des Programmes</h2>
-    <form method="post">
-      <label for="new_program">Ajouter un nouveau programme :</label>
-      <input type="text" name="new_program" id="new_program">
-      <button type="submit" name="action" value="add_program">Ajouter</button>
-    </form>
-    <h3>Programmes existants :</h3>
-    <ul>
-      <?php foreach ($programs as $program): ?>
-        <li>
-          <?php echo htmlspecialchars($program['NomProgramme']); ?>
-          <form method="post" style="display:inline;">
-            <input type="hidden" name="program_id" value="<?php echo $program['IDProgramme']; ?>">
-            <button type="submit" name="action" value="delete_program">Supprimer</button>
-          </form>
-        </li>
-      <?php endforeach; ?>
-    </ul>
-  </div>
+        <div class="program-management">
+            <h2>Gestion des Programmes</h2>
+            <form method="post">
+                <label for="new_program">Ajouter un nouveau programme :</label>
+                <input type="text" name="new_program" id="new_program">
+                <button type="submit" name="action" value="add_program">Ajouter</button>
+            </form>
+            <h3>Programmes existants :</h3>
+            <ul>
+                <?php foreach ($programs as $program): ?>
+                    <li>
+                        <?php echo htmlspecialchars($program['NomProgramme']); ?>
+                        <form method="post" style="display:inline;">
+                            <input type="hidden" name="program_id" value="<?php echo $program['IDProgramme']; ?>">
+                            <button type="submit" name="action" value="delete_program">Supprimer</button>
+                        </form>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
 </div>
-</div>
-</div>
-
-
 
 </body>
 </html>
