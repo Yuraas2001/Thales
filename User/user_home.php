@@ -179,111 +179,52 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
     <h2 class="results-title">Résultats</h2>
     <div class="table-container">
         <table>
-                <thead>
-                        <tr>
-                                <th>Programme</th>
-                                <th>Phase</th>
-                                <th>Description</th>
-                                <th>Mots Clés</th>
-                        </tr>
-                </thead>
-                <tbody>
+            <thead>
+                <tr>
+                    <th>Programme</th>
+                    <th>Phase</th>
+                    <th>Description</th>
+                    <th>Mots Clés</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <div class="export-button">
+                    <a href="export_pdf.php" class="button primary">Exporter en PDF</a>
+                    <a href="export_excel.php" class="button primary">Exporter en Excel</a>
+                </div>
                 <?php
-
-                $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
-                $program = isset($_GET['program']) ? $_GET['program'] : '';
-                $phase = isset($_GET['phase']) ? $_GET['phase'] : '';
-
-                // Prepare SQL query
-                // Prepare SQL query
-                $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
-                FROM PratiqueProg
-                INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
-                INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
-                INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
-                INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique";
-
-                // Add keyword to the query if specified
-                if ($keyword !== '') {
-                    $sql .= " WHERE BonnesPratiques.IDBonnePratique IN (
-                        SELECT PratiqueMotsCles.IDBonnePratique
-                        FROM PratiqueMotsCles
-                        INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                        WHERE MotsCles.NomMotsCles = :keyword
-                    )";
+                // Vérification si une action de suppression est déclenchée
+                if (isset($_POST['Etat'])) {
+                    $delete_id = $_POST['Etat'];
+                    $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 1 WHERE IDBonnePratique = :id");
+                    $query->execute([':id' => $delete_id]);
                 }
 
-                // Add program to the query if specified
-                if ($program !== '') {
-                    $sql .= ($keyword !== '') ? " AND" : " WHERE";
-                    $sql .= " BonnesPratiques.IDBonnePratique IN (
-                        SELECT PratiqueProg.IDBonnePratique
-                        FROM PratiqueProg
-                        INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                        WHERE Programmes.NomProgramme = :program
-                    )";
-                }
-
-                // Add phase to the query if specified
-                if ($phase !== '') {
-                    $sql .= ($keyword !== '' || $program !== '') ? " AND" : " WHERE";
-                    $sql .= " Phases.NomPhase = :phase";
-                }
-
-                $stmt = $bd->prepare($sql);
-
-                if ($keyword !== '') {
-                    $stmt->bindValue(':keyword', $keyword);
-                }
-                if ($program !== '') {
-                    $stmt->bindValue(':program', $program);
-                }
-                if ($phase !== '') {
-                    $stmt->bindValue(':phase', $phase);
-                }
-
-                $stmt->execute();
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                // Group results by IDBonnePratique
-                $groupedResults = [];
-                foreach ($results as $row) {
-                    $id = $row['IDBonnePratique'];
-                    $program = $row['NomProgramme'];
-                    $keyword = $row['NomMotsCles'];
-
-                    if (!isset($groupedResults[$id])) {
-                        $groupedResults[$id] = $row;
-                        $groupedResults[$id]['NomProgramme'] = [$program];
-                        $groupedResults[$id]['NomMotsCles'] = [$keyword];
-                    } else {
-                        if (!in_array($program, $groupedResults[$id]['NomProgramme'])) {
-                            $groupedResults[$id]['NomProgramme'][] = $program;
-                        }
-                        if (!in_array($keyword, $groupedResults[$id]['NomMotsCles'])) {
-                            $groupedResults[$id]['NomMotsCles'][] = $keyword;
-                        }
-                    }
-                }
-
+                // Ajoutez ce bloc de code à la place où vous générez chaque ligne de résultat dans le tableau
                 foreach ($groupedResults as $row) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomProgramme'])) . "</td>";
                     echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
+                    echo "<td>
+                            <form method='post' action='modify_bp.php' style='display:inline;'>
+                                <input type='hidden' name='modify_id' value='" . $row['IDBonnePratique'] . "'>
+                                <button type='submit'>Modifier</button>
+                            </form>
+                            <form method='post' style='display:inline;'>
+                                <input type='hidden' name='Etat' value='" . $row['IDBonnePratique'] . "'>
+                                <button type='submit'>Supprimer</button>
+                            </form>
+                          </td>";
                     echo "</tr>";
                 }
                 ?>
-                </tbody>
+            </tbody>
         </table>
     </div>
 </div>
-      <div class="export-button">
-        <button class="button primary">Exporter le Tableau</button>
-      </div>
 
 </body>
 </html>

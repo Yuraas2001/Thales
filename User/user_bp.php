@@ -56,46 +56,36 @@ $currentUsername = $_SESSION['username']; // Get the current username from sessi
             <input type="text" id="keyword" name="keyword" placeholder="Entrez des mots clés séparés par des virgules">
         </div>
 
-        <label for="program">Programme</label>
+        <div class="form-group">
+            <label for="program">Programme</label>
+            <select id="program" name="program[]" multiple>
+                <?php
+                // Récupérer tous les programmes existants sans doublons
+                $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
+                $query->execute();
+                $programs = $query->fetchAll(PDO::FETCH_COLUMN);
 
-        <?php
-        // Include the database connection file
-        include '../Database/base.php'; 
-
-        // Prepare the SQL query to fetch enum values from 'NomProgramme' column
-        $query = $bd->prepare("SHOW COLUMNS FROM Programmes LIKE 'NomProgramme'");
-        $query->execute();
-        $row = $query->fetch(PDO::FETCH_ASSOC);
-
-        // Extract the enum values
-        preg_match("/^enum\(\'(.*)\'\)$/", $row['Type'], $matches);
-        $enum = explode("','", $matches[1]);
-        ?>
-
-        <div class="checkbox-group">
-            <?php foreach ($enum as $programme): ?>
-                <label>
-                    <input type="checkbox" name="program[]" value="<?php echo $programme; ?>">
-                    <?php echo $programme; ?>
-                </label>
-            <?php endforeach; ?>
+                foreach ($programs as $programme): ?>
+                    <option value="<?php echo htmlspecialchars($programme); ?>"><?php echo htmlspecialchars($programme); ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <div class="form-group">
             <label for="phase">Phase</label>
             <select id="phase" name="phase">
                 <?php
-                // Prepare the SQL query to fetch enum values from 'NomPhase' column
+                // Préparer la requête SQL pour obtenir les valeurs enum de 'NomPhase'
                 $query = $bd->prepare("SHOW COLUMNS FROM Phases LIKE 'NomPhase'");
                 $query->execute();
                 $row = $query->fetch(PDO::FETCH_ASSOC);
 
-                // Extract the enum values
+                // Extraire les valeurs enum
                 preg_match("/^enum\(\'(.*)\'\)$/", $row['Type'], $matches);
                 $enum = explode("','", $matches[1]);
 
                 foreach ($enum as $phase): ?>
-                    <option value="<?php echo $phase; ?>"><?php echo $phase; ?></option>
+                    <option value="<?php echo htmlspecialchars($phase); ?>"><?php echo htmlspecialchars($phase); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>

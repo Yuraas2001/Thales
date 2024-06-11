@@ -1,4 +1,5 @@
 <?php
+    session_start();
     include("../Database/base.php");
 
     
@@ -10,9 +11,6 @@
 
     // Récupérez tous les résultats
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    session_start();
-    $currentUsername = $_SESSION['username'];
 
     foreach ($users as $index => $user) {
         if ($user['NomUtilisateur'] === $currentUsername) {
@@ -54,6 +52,11 @@
         </div>
     </div>
 </nav>
+<div class="menu">
+  <a href="admin_users_list.php">Listes des utilisateurs</a>
+  <a href="admin_bp.php">Gestion des bonnes pratiques</a>
+  <a href="admin_editprog.php">Modifier un programme</a>
+</div>
 
 <style>
 .error {
@@ -66,7 +69,8 @@
         echo "<p class='error'>" . $_SESSION['error'] . "</p>";
         unset($_SESSION['error']);
     }
-    ?>
+?>
+
 
     <h3>Ajouter un utilisateur</h3>
     <form action="../Database/add_user.php" method="post">
@@ -82,15 +86,11 @@
             <option value="admin">Admin</option>
         </select>
 
-        <button type="submit"> Add User </button>
+        <button type="submit">Add User</button>
     </form>
 
 </div>
-<div class="menu">
-    <a href="admin_users_list.php">Listes des utilisateurs</a>
-    <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="admin_banned_users.php">Modifier mot de passe verrouillé</a>
-</div>
+
 <div class="content">
     <table>
         <tr>
@@ -134,22 +134,22 @@
                             ?>
                             <?php if ($user['Bloque'] == 1): ?>
                                 <?php if (isset($_GET['unblock']) && $_GET['unblock'] === $user['NomUtilisateur']): ?>
-                                <!-- Unblock User form -->
+                                <!-- Formulaire de déblocage d'utilisateur -->
                                 <form action="../Database/unblock_user.php" method="POST">
                                     <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
                                     New Password: <input type="password" name="new_password">
                                     <button type="submit">Submit</button>
                                     <?php
-                                    // Start the session if it's not already started
+                                    // Démarrez la session si elle n'est pas déjà démarrée
                                     if (session_status() == PHP_SESSION_NONE) {
                                         session_start();
                                     }
 
-                                    // Check if there's an error message and display it
+                                    // Vérifiez s'il y a un message d'erreur et affichez-le
                                     if (isset($_SESSION['error'])) {
                                         echo '<p style="color: red;">' . $_SESSION['error'] . '</p>';
 
-                                        // Unset the error message so it doesn't persist
+                                        // Supprimez le message d'erreur pour qu'il ne persiste pas
                                         unset($_SESSION['error']);
                                     }
                                     ?>

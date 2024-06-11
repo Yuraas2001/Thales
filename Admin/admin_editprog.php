@@ -2,13 +2,18 @@
 session_start();
 include("../Database/base.php");
 
+// Vérifiez si l'utilisateur est connecté
+if (!isset($_SESSION['username'])) {
+    // Redirigez l'utilisateur vers la page de connexion s'il n'est pas connecté
+    header("Location: login.php");
+    exit;
+}
+
 $currentUsername = $_SESSION['username'];
 
 // Préparez et exécutez la requête SQL pour les utilisateurs
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
-
-// Récupérez tous les résultats
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($users as $index => $user) {
@@ -21,14 +26,24 @@ foreach ($users as $index => $user) {
 
 // Ajouter un programme
 if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
-    $newProgram = $_POST['new_program'];
-    // Vérifiez si le programme existe déjà
-    $checkQuery = $bd->prepare("SELECT * FROM Programmes WHERE NomProgramme = :new_program");
-    $checkQuery->execute([':new_program' => $newProgram]);
-    if ($checkQuery->rowCount() == 0) {
-        // Ajoutez le nouveau programme s'il n'existe pas
-        $query = $bd->prepare("INSERT INTO Programmes (NomProgramme) VALUES (:new_program)");
-        $query->execute([':new_program' => $newProgram]);
+    $newProgram = trim($_POST['new_program']);
+    if (!empty($newProgram)) {
+        // Vérifiez si le programme existe déjà
+        $checkQuery = $bd->prepare("SELECT * FROM Programmes WHERE NomProgramme = :new_program");
+        $checkQuery->execute([':new_program' => $newProgram]);
+        if ($checkQuery->rowCount() == 0) {
+            // Ajoutez le nouveau programme s'il n'existe pas
+            $query = $bd->prepare("INSERT INTO Programmes (NomProgramme) VALUES (:new_program)");
+            if ($query->execute([':new_program' => $newProgram])) {
+                echo "Programme ajouté avec succès.";
+            } else {
+                echo "Erreur lors de l'ajout du programme.";
+            }
+        } else {
+            echo "Le programme existe déjà.";
+        }
+    } else {
+        echo "Le nom du programme ne peut pas être vide.";
     }
 }
 
@@ -39,8 +54,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_program') {
     $query->execute([':program_id' => $programId]);
 }
 
-// Requête SQL pour les programmes
-$programStmt = $bd->prepare("SELECT IDProgramme, NomProgramme FROM Programmes");
+// Requête SQL pour les programmes avec DISTINCT pour éviter les doublons
+$programStmt = $bd->prepare("SELECT DISTINCT IDProgramme, NomProgramme FROM Programmes");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -117,23 +132,77 @@ foreach ($results as $row) {
             <h2>Gestion des Programmes</h2>
             <form method="post">
                 <label for="new_program">Ajouter un nouveau programme :</label>
-                <input type="text" name="new_program" id="new_program">
+                <input type="text" name="new_program" id="new_program" required>
                 <button type="submit" name="action" value="add_program">Ajouter</button>
             </form>
             <h3>Programmes existants :</h3>
-            <ul>
-                <?php foreach ($programs as $program): ?>
-                    <li>
-                        <?php echo htmlspecialchars($program['NomProgramme']); ?>
-                        <form method="post" style="display:inline;">
-                            <input type="hidden" name="program_id" value="<?php echo $program['IDProgramme']; ?>">
-                            <button type="submit" name="action" value="delete_program">Supprimer</button>
-                        </form>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Programme</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($programs as $program): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($program['NomProgramme']); ?></td>
+                            <td>
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="program_id" value="<?php echo htmlspecialchars($program['IDProgramme']); ?>">
+                                    <button type="submit" name="action" value="delete_program">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
+
+<div class="container">
+  <h2 class="results-title">Résultats</h2>
+  <div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Programme</th>
+                <th>Phase</th>
+                <th>Description</th>
+                <th>Mots Clés</th>
+                <th>État</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php
+        // Parcourez les résultats groupés et créez des lignes de tableau
+        foreach ($groupedResults as $row) {
+          $status = $row['Etat'] ? "<span style='color: red;'>Supprimé</span>" : "Actif";
+          echo "<tr>";
+          echo "<td>" . htmlspecialchars(implode(", ", $row['NomProgramme'])) . "</td>";
+          echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
+          echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
+          echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
+          echo "<td>" . $status . "</td>";
+          echo "<td>
+                  <form method='post'>
+                      <input type='hidden' name='id' value='" . $row['IDBonnePratique'] . "'>
+                      " . ($row['Etat'] ? "<button type='submit' name='action' value='restore'>Restaurer</button>" : "") . "
+                      <button type='submit' name='action' value='permanent_delete'>Suppression Définitive</button>
+                  </form>
+                </td>";
+          echo "</tr>";
+        }
+        ?>
+        </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="export-button">
+    <button class="button primary">Exporter le Tableau</button>
 </div>
 
 </body>

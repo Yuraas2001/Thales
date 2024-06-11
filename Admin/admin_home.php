@@ -23,41 +23,92 @@ foreach ($users as $index => $user) {
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/Styles/admin.css">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  
-  
- 
-     <title>Rebooters Search</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Styles/user.css">
+    <link rel="stylesheet" href="/Styles/admin.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <title>Rebooters Search</title>
 </head>
 <body>
-
 <nav>
-    <div class="logo">
-        <img src="Images/logo.svg" alt="REBOOTERS Logo" height="200" > <!-- Ajustez le chemin et la taille -->
-       
-    </div>
-   
-    <div>
-       
-        <div class="user-menu">
-        <a href="./admin_home.php" class="menu-button">Admin</a> <button class="user-button">☰</button>
-          <div class="user-dropdown">
-            <a href="../Database/deconnex.php">Se déconnecter</a>
-          </div>
+        <div class="logo">
+                <img src="/Images/logo.svg" alt="REBOOTERS Logo" height="200" >
         </div>
-      </div>
+        <div>
+                <div class="user-menu">
+                <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
+                    <button class="user-button">☰</button>
+                    <div class="user-dropdown">
+                        <a href="../Database/deconnex.php">Se déconnecter</a>
+                    </div>
+                </div>
+            </div>
 </nav>
 <div class="menu">
     <a href="admin_users_list.php">Listes des utilisateurs</a>
     <a href="admin_bp.php">Gestion des bonnes pratiques</a>
     <a href="admin_editprog.php">Modifier un programme</a>
 </div>
-<div class="content">
-    <div id="add-remove" class="section">
-        <h3>Liste des Utilisateurs</h3>
+<style>
+.reset-button {
+    margin-left: 10px;
+}
+</style>
+
+<div class="search-container">
+    <form action="admin_home.php" method="get">
+        <input type="text" name="keyword" placeholder="Entrer un mot clé...">
+        
+        <label for="program">Programme</label>
+        <?php
+        include '../Database/base.php';
+        // Prepare the SQL query
+        $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
+
+        // Execute the query
+        $query->execute();
+
+        // Fetch the results
+        $programmes = $query->fetchAll(PDO::FETCH_COLUMN);
+        ?>
+        <select name="program">
+            <option value="">Programme</option>
+            <?php foreach ($programmes as $programme): ?>
+                <option value="<?php echo $programme; ?>"><?php echo $programme; ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <label for="phase">Phase</label>
+        <?php
+        // Prepare the SQL query
+        $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases");
+
+        // Execute the query
+        $query->execute();
+
+        // Fetch the results
+        $phases = $query->fetchAll(PDO::FETCH_COLUMN);
+        ?>
+        <select name="phase">
+            <option value="">Phase</option>
+            <?php foreach ($phases as $phase): ?>
+                <option value="<?php echo $phase; ?>"><?php echo $phase; ?></option>
+            <?php endforeach; ?>
+        </select>
+
+        <button class="search-button">
+            <i class="fa fa-search"></i> 
+        </button>
+    </form>
+    <a href="admin_home.php" class="reset-button" style="margin-left: 10px;">
+        <i class="fa fa-refresh"></i> 
+    </a>
+</div>
+
+<div class="container">
+    <h2 class="results-title">Résultats</h2>
+    <div class="table-container">
         <table>
                 <thead>
                         <tr>
@@ -68,6 +119,10 @@ foreach ($users as $index => $user) {
                         </tr>
                 </thead>
                 <tbody>
+    <div class="export-button">
+  <a href="export_pdf.php" class="button primary">Exporter en PDF</a>
+  <a href="export_excel.php" class="button primary">Exporter en Excel</a>
+</div>
                 <?php
 
                 $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
@@ -156,21 +211,13 @@ foreach ($users as $index => $user) {
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
                     echo "</tr>";
                 }
+                
                 ?>
                 </tbody>
         </table>
-        <h3>Ajouter un Utilisateur</h3>
-        <form>
-            <input type="text" placeholder="Nom">
-            <input type="text" placeholder="Mot de passe">
-            <button type="submit">Ajouter</button>
-        </form>
     </div>
 </div>
-<div class="export-button">
-        <button class="button primary">Exporter le Tableau</button>
-</div>
+
+
 </body>
 </html>
-      
-</body>
