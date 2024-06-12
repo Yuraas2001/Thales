@@ -32,6 +32,24 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 $programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_COLUMN);
+
+// Check if an action is triggered
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $id = $_POST['id'];
+    $action = $_POST['action'];
+    
+    if ($action === 'restore') {
+        $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 0 WHERE IDBonnePratique = :id");
+        $query->execute([':id' => $id]);
+    } elseif ($action === 'permanent_delete') {
+        $query = $bd->prepare("DELETE FROM BonnesPratiques WHERE IDBonnePratique = :id");
+        $query->execute([':id' => $id]);
+    }
+
+    // Refresh the page to reflect changes
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -159,24 +177,6 @@ $programs = $programStmt->fetchAll(PDO::FETCH_COLUMN);
                   </form>
                 </td>";
           echo "</tr>";
-        }
-
-        // Check if an action is triggered
-        if (isset($_POST['action'])) {
-          $id = $_POST['id'];
-          $action = $_POST['action'];
-          
-          if ($action === 'restore') {
-            $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 0 WHERE IDBonnePratique = :id");
-            $query->execute([':id' => $id]);
-          } elseif ($action === 'permanent_delete') {
-            $query = $bd->prepare("DELETE FROM BonnesPratiques WHERE IDBonnePratique = :id");
-            $query->execute([':id' => $id]);
-          }
-
-          // Refresh the page to reflect changes
-          header("Location: " . $_SERVER['PHP_SELF']);
-          exit();
         }
         ?>
         </tbody>

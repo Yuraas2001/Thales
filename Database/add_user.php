@@ -1,30 +1,24 @@
 <?php
-    include("base.php");
+session_start();
+include("../Database/base.php");
 
-    // Check if the form is submitted
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Retrieve the form data
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-        $role = $_POST['role'] == 'admin' ? 1 : 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $role = $_POST['role'] === 'admin' ? 1 : 0;
 
-        // Prepare the SQL INSERT statement
-        $stmt = $bd->prepare("INSERT INTO Utilisateurs (NomUtilisateur, MotDePasse, TypeUtilisateur) VALUES (:username, :password, :role)");
+    // Hacher le mot de passe
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        // Bind the form data to the SQL INSERT statement
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':password', $password);
-        $stmt->bindParam(':role', $role);
-
-        // Execute the SQL INSERT statement
-        $stmt->execute();
-
-        // Redirect back to the admin user list
-        header('Location: ../Admin/admin_users_list.php');
-        exit;
+    // Insérer le nouvel utilisateur dans la base de données
+    $stmt = $bd->prepare("INSERT INTO Utilisateurs (NomUtilisateur, MotDePasse, TypeUtilisateur) VALUES (:username, :password, :role)");
+    if ($stmt->execute([':username' => $username, ':password' => $hashedPassword, ':role' => $role])) {
+        $_SESSION['success'] = "Utilisateur ajouté avec succès.";
     } else {
-        // Redirect back to the admin user list if the form is not submitted
-        header('Location: ../Admin/admin_users_list.php');
-        exit;
+        $_SESSION['error'] = "Erreur lors de l'ajout de l'utilisateur.";
     }
+
+    header("Location: ../admin/admin_home.php");
+    exit;
+}
 ?>

@@ -1,30 +1,29 @@
 <?php
-    session_start();
-    include("../Database/base.php");
+session_start();
+include("../Database/base.php");
 
-    
-    $currentUsername = $_SESSION['username'];
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit;
+}
 
-    // Préparez et exécutez la requête SQL
-    $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
-    $stmt->execute();
+$currentUsername = $_SESSION['username'];
 
-    // Récupérez tous les résultats
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Préparez et exécutez la requête SQL pour les utilisateurs
+$stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
+$stmt->execute();
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($users as $index => $user) {
-        if ($user['NomUtilisateur'] === $currentUsername) {
-            // Retirez l'utilisateur de sa position actuelle
-            unset($users[$index]);
-
-            // Ajoutez l'utilisateur au début du tableau
-            array_unshift($users, $user);
-
-            break;
-        }
+foreach ($users as $index => $user) {
+    if ($user['NomUtilisateur'] === $currentUsername) {
+        unset($users[$index]);
+        array_unshift($users, $user);
+        break;
     }
+}
 
-    $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
+$usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 ?>
 
 <!DOCTYPE html>
@@ -71,30 +70,28 @@
     }
 ?>
 
-
     <h3>Ajouter un utilisateur</h3>
     <form action="../Database/add_user.php" method="post">
-        <label for="username">Username:</label>
+        <label for="username">Nom d'utilisateur:</label>
         <input type="text" id="username" name="username" required>
 
-        <label for="password">Password:</label>
+        <label for="password">Mot de passe:</label>
         <input type="password" id="password" name="password" required>
 
-        <label for="role">Role:</label>
+        <label for="role">Rôle:</label>
         <select id="role" name="role">
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
+            <option value="user">Utilisateur</option>
+            <option value="admin">Administrateur</option>
         </select>
 
-        <button type="submit">Add User</button>
+        <button type="submit">Ajouter l'utilisateur</button>
     </form>
-
 </div>
 
 <div class="content">
     <table>
         <tr>
-            <th>Username</th>
+            <th>Nom d'utilisateur</th>
             <th>Rôle</th>
             <th>Bloqué</th>
             <th>Action</th>
@@ -102,7 +99,7 @@
         <?php foreach ($users as $user): ?>
             <tr>
                 <td><?php echo htmlspecialchars($user['NomUtilisateur']); ?></td>
-                <td><?php echo $user['TypeUtilisateur'] == 1 ? 'Admin' : 'User'; ?></td>
+                <td><?php echo $user['TypeUtilisateur'] == 1 ? 'Administrateur' : 'Utilisateur'; ?></td>
                 <td><?php echo $user['Bloque'] == 1 ? 'Oui' : ''; ?></td>
                 <td>
                     <?php if ($usernameToModify === $user['NomUtilisateur'] && $currentUsername !== $user['NomUtilisateur']): ?>
@@ -118,13 +115,13 @@
                                 <form action="../Database/change_role.php" method="post">
                                     <input type="hidden" name="old_username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
 
-                                    <label for="new_username">New Username:</label>
+                                    <label for="new_username">Nouveau nom d'utilisateur:</label>
                                     <input type="text" id="new_username" name="new_username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
 
-                                    <label for="new_role">New Role:</label>
+                                    <label for="new_role">Nouveau rôle:</label>
                                     <select id="new_role" name="new_role">
-                                        <option value="0" <?php echo $user['TypeUtilisateur'] == 'User' ? 'selected' : ''; ?>>User</option>
-                                        <option value="1" <?php echo $user['TypeUtilisateur'] == 'Admin' ? 'selected' : ''; ?>>Admin</option>
+                                        <option value="0" <?php echo $user['TypeUtilisateur'] == 0 ? 'selected' : ''; ?>>Utilisateur</option>
+                                        <option value="1" <?php echo $user['TypeUtilisateur'] == 1 ? 'selected' : ''; ?>>Administrateur</option>
                                     </select>
 
                                     <input type="submit" value="Modifier">
@@ -137,31 +134,17 @@
                                 <!-- Formulaire de déblocage d'utilisateur -->
                                 <form action="../Database/unblock_user.php" method="POST">
                                     <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
-                                    New Password: <input type="password" name="new_password">
-                                    <button type="submit">Submit</button>
-                                    <?php
-                                    // Démarrez la session si elle n'est pas déjà démarrée
-                                    if (session_status() == PHP_SESSION_NONE) {
-                                        session_start();
-                                    }
-
-                                    // Vérifiez s'il y a un message d'erreur et affichez-le
-                                    if (isset($_SESSION['error'])) {
-                                        echo '<p style="color: red;">' . $_SESSION['error'] . '</p>';
-
-                                        // Supprimez le message d'erreur pour qu'il ne persiste pas
-                                        unset($_SESSION['error']);
-                                    }
-                                    ?>
+                                    Nouveau mot de passe: <input type="password" name="new_password" required>
+                                    <button type="submit">Débloquer</button>
                                 </form>
                                 <?php else: ?>
                                     <a href="?unblock=<?php echo urlencode($user['NomUtilisateur']); ?>">Débloquer</a>
                                 <?php endif; ?>
                             <?php endif; ?>
                             <!-- Le bouton Supprimer -->
-                            <form action="../Database/delete_user.php" method="POST" onsubmit="return confirm('Are you sure ?');">
+                            <form action="../Database/delete_user.php" method="POST" onsubmit="return confirm('Êtes-vous sûr ?');">
                                 <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
-                                <button type="submit">Delete</button>
+                                <button type="submit">Supprimer</button>
                             </form>
                         <?php endif; ?>
                     <?php endif; ?>

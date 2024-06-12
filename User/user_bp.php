@@ -20,6 +20,27 @@ $currentUsername = $_SESSION['username']; // Get the current username from sessi
   <link rel="stylesheet" href="/Styles/admin.css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <title>Rebooters Search</title>
+  <style>
+    .dropdown-checkbox {
+        position: relative;
+        display: inline-block;
+    }
+    .dropdown-checkbox-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+    .dropdown-checkbox-content label {
+        display: block;
+        padding: 12px 16px;
+    }
+    .dropdown-checkbox:hover .dropdown-checkbox-content {
+        display: block;
+    }
+  </style>
 </head>
 <body>
 
@@ -58,17 +79,23 @@ $currentUsername = $_SESSION['username']; // Get the current username from sessi
 
         <div class="form-group">
             <label for="program">Programme</label>
-            <select id="program" name="program[]" multiple>
-                <?php
-                // Récupérer tous les programmes existants sans doublons
-                $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
-                $query->execute();
-                $programs = $query->fetchAll(PDO::FETCH_COLUMN);
+            <div class="dropdown-checkbox">
+                <button type="button">Sélectionner les programmes</button>
+                <div class="dropdown-checkbox-content">
+                    <?php
+                    // Récupérer tous les programmes existants sans doublons
+                    $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
+                    $query->execute();
+                    $allPrograms = $query->fetchAll(PDO::FETCH_COLUMN);
 
-                foreach ($programs as $programme): ?>
-                    <option value="<?php echo htmlspecialchars($programme); ?>"><?php echo htmlspecialchars($programme); ?></option>
-                <?php endforeach; ?>
-            </select>
+                    foreach ($allPrograms as $programme): ?>
+                        <label>
+                            <input type="checkbox" name="program[]" value="<?php echo htmlspecialchars($programme); ?>">
+                            <?php echo htmlspecialchars($programme); ?>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
 
         <div class="form-group">

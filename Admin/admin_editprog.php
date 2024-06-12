@@ -4,7 +4,6 @@ include("../Database/base.php");
 
 // Vérifiez si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
-    // Redirigez l'utilisateur vers la page de connexion s'il n'est pas connecté
     header("Location: login.php");
     exit;
 }
@@ -28,11 +27,9 @@ foreach ($users as $index => $user) {
 if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
     $newProgram = trim($_POST['new_program']);
     if (!empty($newProgram)) {
-        // Vérifiez si le programme existe déjà
         $checkQuery = $bd->prepare("SELECT * FROM Programmes WHERE NomProgramme = :new_program");
         $checkQuery->execute([':new_program' => $newProgram]);
         if ($checkQuery->rowCount() == 0) {
-            // Ajoutez le nouveau programme s'il n'existe pas
             $query = $bd->prepare("INSERT INTO Programmes (NomProgramme) VALUES (:new_program)");
             if ($query->execute([':new_program' => $newProgram])) {
                 echo "Programme ajouté avec succès.";
@@ -54,46 +51,10 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_program') {
     $query->execute([':program_id' => $programId]);
 }
 
-// Requête SQL pour les programmes avec DISTINCT pour éviter les doublons
-$programStmt = $bd->prepare("SELECT DISTINCT IDProgramme, NomProgramme FROM Programmes");
+// Requête SQL pour les programmes distincts
+$programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes WHERE TRIM(NomProgramme) != ''");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Requête SQL pour les bonnes pratiques
-$stmt = $bd->prepare("
-  SELECT bp.IDBonnePratique, p.NomProgramme, ph.NomPhase, bp.Description, mc.NomMotsCles, bp.Etat
-  FROM PratiqueProg pp
-  INNER JOIN Programmes p ON pp.IDProgramme = p.IDProgramme
-  INNER JOIN PratiquePhases pp2 ON pp.IDBonnePratique = pp2.IDBonnePratique
-  INNER JOIN Phases ph ON pp2.IDPhase = ph.IDPhase
-  INNER JOIN PratiqueMotsCles pmc ON pp.IDBonnePratique = pmc.IDBonnePratique
-  INNER JOIN MotsCles mc ON pmc.IDMotsCles = mc.IDMotsCles
-  INNER JOIN BonnesPratiques bp ON pp.IDBonnePratique = bp.IDBonnePratique
-");
-
-$stmt->execute();
-$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Regrouper les résultats par bonne pratique, programme et mot clé
-$groupedResults = [];
-foreach ($results as $row) {
-  $id = $row['IDBonnePratique'];
-  $program = $row['NomProgramme'];
-  $keyword = $row['NomMotsCles'];
-
-  if (!isset($groupedResults[$id])) {
-    $groupedResults[$id] = $row;
-    $groupedResults[$id]['NomProgramme'] = [$program];
-    $groupedResults[$id]['NomMotsCles'] = [$keyword];
-  } else {
-    if (!in_array($program, $groupedResults[$id]['NomProgramme'])) {
-      $groupedResults[$id]['NomProgramme'][] = $program;
-    }
-    if (!in_array($keyword, $groupedResults[$id]['NomMotsCles'])) {
-      $groupedResults[$id]['NomMotsCles'][] = $keyword;
-    }
-  }
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -136,74 +97,17 @@ foreach ($results as $row) {
                 <button type="submit" name="action" value="add_program">Ajouter</button>
             </form>
             <h3>Programmes existants :</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Programme</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($programs as $program): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($program['NomProgramme']); ?></td>
-                            <td>
-                                <form method="post" style="display:inline;">
-                                    <input type="hidden" name="program_id" value="<?php echo htmlspecialchars($program['IDProgramme']); ?>">
-                                    <button type="submit" name="action" value="delete_program">Supprimer</button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+            <select id="existing_programs" name="existing_programs">
+                <?php foreach ($programs as $program): ?>
+                    <option value="<?php echo htmlspecialchars($program['NomProgramme']); ?>"><?php echo htmlspecialchars($program['NomProgramme']); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <form method="post" style="display:inline;">
+                <input type="hidden" name="program_id" id="program_id" value="">
+                <button type="submit" name="action" value="delete_program" onclick="return confirm('Voulez-vous vraiment supprimer ce programme?')">Supprimer</button>
+            </form>
         </div>
     </div>
 </div>
-
-<div class="container">
-  <h2 class="results-title">Résultats</h2>
-  <div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>Programme</th>
-                <th>Phase</th>
-                <th>Description</th>
-                <th>Mots Clés</th>
-                <th>État</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php
-        // Parcourez les résultats groupés et créez des lignes de tableau
-        foreach ($groupedResults as $row) {
-          $status = $row['Etat'] ? "<span style='color: red;'>Supprimé</span>" : "Actif";
-          echo "<tr>";
-          echo "<td>" . htmlspecialchars(implode(", ", $row['NomProgramme'])) . "</td>";
-          echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
-          echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
-          echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
-          echo "<td>" . $status . "</td>";
-          echo "<td>
-                  <form method='post'>
-                      <input type='hidden' name='id' value='" . $row['IDBonnePratique'] . "'>
-                      " . ($row['Etat'] ? "<button type='submit' name='action' value='restore'>Restaurer</button>" : "") . "
-                      <button type='submit' name='action' value='permanent_delete'>Suppression Définitive</button>
-                  </form>
-                </td>";
-          echo "</tr>";
-        }
-        ?>
-        </tbody>
-    </table>
-  </div>
-</div>
-
-<div class="export-button">
-    <button class="button primary">Exporter le Tableau</button>
-</div>
-
 </body>
 </html>

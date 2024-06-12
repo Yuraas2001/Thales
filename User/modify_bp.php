@@ -32,7 +32,7 @@ if (isset($_POST['modify_id'])) {
     $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     // Récupérer les programmes associés à la bonne pratique
-    $stmt = $bd->prepare("SELECT NomProgramme FROM Programmes 
+    $stmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes 
                           INNER JOIN PratiqueProg ON Programmes.IDProgramme = PratiqueProg.IDProgramme 
                           WHERE PratiqueProg.IDBonnePratique = :id");
     $stmt->execute([':id' => $id]);
@@ -66,18 +66,38 @@ if (isset($_POST['modify_id'])) {
         $stmt->execute([':id' => $id]);
 
         // Ajout des nouvelles entrées
-        $stmt = $bd->prepare("INSERT INTO PratiqueMotsCles (IDBonnePratique, IDMotsCles) VALUES (:id, (SELECT IDMotsCles FROM MotsCles WHERE NomMotsCles = :keyword))");
-        $stmt->execute([':id' => $id, ':keyword' => $keyword]);
-
-        foreach ($programs as $program) {
-            $stmt = $bd->prepare("INSERT INTO PratiqueProg (IDBonnePratique, IDProgramme) VALUES (:id, (SELECT IDProgramme FROM Programmes WHERE NomProgramme = :program))");
-            $stmt->execute([':id' => $id, ':program' => $program]);
+        // Pour les mots clés, suppose que les mots clés sont séparés par des virgules
+        $keywordsArray = explode(',', $keyword);
+        foreach ($keywordsArray as $keyword) {
+            $stmt = $bd->prepare("SELECT IDMotsCles FROM MotsCles WHERE NomMotsCles = :keyword");
+            $stmt->execute([':keyword' => trim($keyword)]);
+            $keywordId = $stmt->fetchColumn();
+            if ($keywordId) {
+                $stmt = $bd->prepare("INSERT INTO PratiqueMotsCles (IDBonnePratique, IDMotsCles) VALUES (:id, :keywordId)");
+                $stmt->execute([':id' => $id, ':keywordId' => $keywordId]);
+            }
         }
 
-        $stmt = $bd->prepare("INSERT INTO PratiquePhases (IDBonnePratique, IDPhase) VALUES (:id, (SELECT IDPhase FROM Phases WHERE NomPhase = :phase))");
-        $stmt->execute([':id' => $id, ':phase' => $phase]);
+        foreach ($programs as $program) {
+            $stmt = $bd->prepare("SELECT IDProgramme FROM Programmes WHERE NomProgramme = :program");
+            $stmt->execute([':program' => $program]);
+            $programId = $stmt->fetchColumn();
+            if ($programId) {
+                $stmt = $bd->prepare("INSERT INTO PratiqueProg (IDBonnePratique, IDProgramme) VALUES (:id, :programId)");
+                $stmt->execute([':id' => $id, ':programId' => $programId]);
+            }
+        }
+
+        $stmt = $bd->prepare("SELECT IDPhase FROM Phases WHERE NomPhase = :phase");
+        $stmt->execute([':phase' => $phase]);
+        $phaseId = $stmt->fetchColumn();
+        if ($phaseId) {
+            $stmt = $bd->prepare("INSERT INTO PratiquePhases (IDBonnePratique, IDPhase) VALUES (:id, :phaseId)");
+            $stmt->execute([':id' => $id, ':phaseId' => $phaseId]);
+        }
 
         echo "Bonne pratique mise à jour avec succès.";
+        echo '<br><a href="user_home.php" class="btn">Retour à la liste</a>';
         exit;
     }
 } else {
@@ -94,7 +114,28 @@ if (isset($_POST['modify_id'])) {
   <link rel="stylesheet" href="/Styles/user_bp.css">
   <link rel="stylesheet" href="/Styles/admin.css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  <title>Rebooters Search</title>
+  <title>Modifier la bonne pratique</title>
+  <style>
+    .dropdown-checkbox {
+        position: relative;
+        display: inline-block;
+    }
+    .dropdown-checkbox-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+    .dropdown-checkbox-content label {
+        display: block;
+        padding: 12px 16px;
+    }
+    .dropdown-checkbox:hover .dropdown-checkbox-content {
+        display: block;
+    }
+  </style>
 </head>
 <body>
 
@@ -135,17 +176,23 @@ if (isset($_POST['modify_id'])) {
 
         <div class="form-group">
             <label for="program">Programme</label>
-            <select id="program" name="program[]" multiple>
-                <?php
-                // Récupérer tous les programmes existants
-                $query = $bd->prepare("SELECT NomProgramme FROM Programmes");
-                $query->execute();
-                $allPrograms = $query->fetchAll(PDO::FETCH_COLUMN);
+            <div class="dropdown-checkbox">
+                <button type="button">Sélectionner les programmes</button>
+                <div class="dropdown-checkbox-content">
+                    <?php
+                    // Récupérer tous les programmes existants sans doublons
+                    $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
+                    $query->execute();
+                    $allPrograms = $query->fetchAll(PDO::FETCH_COLUMN);
 
-                foreach ($allPrograms as $programme): ?>
-                    <option value="<?php echo htmlspecialchars($programme); ?>" <?php echo in_array($programme, $programs) ? 'selected' : ''; ?>><?php echo htmlspecialchars($programme); ?></option>
-                <?php endforeach; ?>
-            </select>
+                    foreach ($allPrograms as $programme): ?>
+                        <label>
+                            <input type="checkbox" name="program[]" value="<?php echo htmlspecialchars($programme); ?>" <?php echo in_array($programme, $programs) ? 'checked' : ''; ?>>
+                            <?php echo htmlspecialchars($programme); ?>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
 
         <div class="form-group">

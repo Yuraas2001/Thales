@@ -170,7 +170,7 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
             <i class="fa fa-search"></i> 
         </button>
     </form>
-    <a href="admin_home.php" class="reset-button" style="margin-left: 10px;">
+    <a href="user_home.php" class="reset-button" style="margin-left: 10px;">
         <i class="fa fa-refresh"></i> 
     </a>
 </div>
