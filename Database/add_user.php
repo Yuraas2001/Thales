@@ -7,12 +7,16 @@
         $username = $_POST['username'];
         $password = $_POST['password'];
         $role = $_POST['role'];
+            // Get the password requirements from the database
+            $stmt = $bd->prepare("SELECT * FROM PasswordRequirements ORDER BY id DESC LIMIT 1");
+            $stmt->execute();
+            $requirements = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            $n = $requirements['n']; // Number of numeric characters
+            $p = $requirements['p']; // Number of lowercase alphabetic characters
+            $q = $requirements['q']; // Number of uppercase alphabetic characters
+            $r = $requirements['r']; // Number of special characters
 
-        // Define the password requirements
-        $n = 1; // Number of numeric characters
-        $p = 1; // Number of lowercase alphabetic characters
-        $q = 1; // Number of uppercase alphabetic characters
-        $r = 1; // Number of special characters
 
         // Check the password against the requirements
         if (!preg_match('/^[^\p{M}]*$/u', $password)) {

@@ -33,7 +33,9 @@
 <div class="menu">
   <a href="admin_users_list.php">Listes des utilisateurs</a>
   <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-  <a href="admin_banned_users.php">Modifier mot de passe verrouillé</a>
+  <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
+  <a href="admin_add_bp.php">Ajouter une bonne pratique</a>
+
 </div>
 </section>
 <div class="search-container">

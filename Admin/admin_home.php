@@ -26,7 +26,9 @@
 <div class="menu">
     <a href="admin_users_list.php">Listes des utilisateurs</a>
     <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="admin_banned_users.php">Modifier mot de passe verrouillé</a>
+    <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="admin_add_bp.php">Ajouter une bonne pratique</a>
+
 </div>
 <style>
 .reset-button {
@@ -60,13 +62,14 @@
         <label for="phase">Phase</label>
         <?php
         // Prepare the SQL query
-        $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases");
+            $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases ORDER BY FIELD(NomPhase, 'préparation', 'codage', 'exécution', 'analyse')");
 
-        // Execute the query
-        $query->execute();
+            // Exécution de la requête
+            $query->execute();
 
-        // Fetch the results
-        $phases = $query->fetchAll(PDO::FETCH_COLUMN);
+            // Récupération des résultats
+            $phases = $query->fetchAll(PDO::FETCH_COLUMN);
+
         ?>
         <select name="phase">
             <option value="">Phase</option>
@@ -94,67 +97,82 @@
                                 <th>Phase</th>
                                 <th>Description</th>
                                 <th>Mots Clés</th>
+                                <th>Modification</th>
+
                         </tr>
                 </thead>
                 <tbody>
                 <?php
 
+            
+
                 $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
+                strpos($keyword, ',') !== false ? $keywords = explode(',', $keyword) : $keywords = [$keyword];
                 $program = isset($_GET['program']) ? $_GET['program'] : '';
                 $phase = isset($_GET['phase']) ? $_GET['phase'] : '';
 
-                // Prepare SQL query
-                // Prepare SQL query
-                $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
-                FROM PratiqueProg
-                INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
-                INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
-                INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
-                INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique";
+                // Préparation de la requête SQL
+                    $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
+                    FROM PratiqueProg
+                    INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+                    INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
+                    INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
+                    INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
+                    INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+                    INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique";
 
-                // Add keyword to the query if specified
-                if ($keyword !== '') {
-                    $sql .= " WHERE BonnesPratiques.IDBonnePratique IN (
-                        SELECT PratiqueMotsCles.IDBonnePratique
-                        FROM PratiqueMotsCles
-                        INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                        WHERE MotsCles.NomMotsCles = :keyword
-                    )";
-                }
+                    $conditions = [];
+                    $params = [];
 
-                // Add program to the query if specified
-                if ($program !== '') {
-                    $sql .= ($keyword !== '') ? " AND" : " WHERE";
-                    $sql .= " BonnesPratiques.IDBonnePratique IN (
-                        SELECT PratiqueProg.IDBonnePratique
-                        FROM PratiqueProg
-                        INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                        WHERE Programmes.NomProgramme = :program
-                    )";
-                }
+                    // Ajout des conditions de recherche par mot clé
+                    if ($keyword !== '') {
+                    $placeholders = implode(',', array_fill(0, count($keywords), '?'));
+                    $conditions[] = "BonnesPratiques.IDBonnePratique IN (
+                                    SELECT PratiqueMotsCles.IDBonnePratique
+                                    FROM PratiqueMotsCles
+                                    INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+                                    WHERE MotsCles.NomMotsCles IN ($placeholders)
+                                )";
+                    foreach ($keywords as $word) {
+                    $params[] = trim($word);
+                    }
+                    }
 
-                // Add phase to the query if specified
-                if ($phase !== '') {
-                    $sql .= ($keyword !== '' || $program !== '') ? " AND" : " WHERE";
-                    $sql .= " Phases.NomPhase = :phase";
-                }
+                    // Ajout des conditions de recherche par programme
+                    if ($program !== '') {
+                    $conditions[] = "BonnesPratiques.IDBonnePratique IN (
+                                    SELECT PratiqueProg.IDBonnePratique
+                                    FROM PratiqueProg
+                                    INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+                                    WHERE Programmes.NomProgramme = ? OR Programmes.NomProgramme = 'GENERIC'
+                                )";
+                    $params[] = $program;
+                    }
 
-                $stmt = $bd->prepare($sql);
+                    // Ajout des conditions de recherche par phase
+                    if ($phase !== '') {
+                    $conditions[] = "Phases.NomPhase = ?";
+                    $params[] = $phase;
+                    }
 
-                if ($keyword !== '') {
-                    $stmt->bindValue(':keyword', $keyword);
-                }
-                if ($program !== '') {
-                    $stmt->bindValue(':program', $program);
-                }
-                if ($phase !== '') {
-                    $stmt->bindValue(':phase', $phase);
-                }
+                    // Concaténation des conditions avec 'WHERE' ou 'AND' selon le cas
+                    if (!empty($conditions)) {
+                    $sql .= ' WHERE ' . implode(' AND ', $conditions);
+                    }
 
-                $stmt->execute();
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    // Ajout du tri par phase
+                    $sql .= " ORDER BY FIELD(Phases.NomPhase, 'préparation', 'codage', 'exécution', 'analyse')";
+
+                    $stmt = $bd->prepare($sql);
+
+                    // Liaison des paramètres
+                    foreach ($params as $index => $param) {
+                    $stmt->bindValue($index + 1, $param);
+                    }
+
+                    $stmt->execute();
+                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
                 // Group results by IDBonnePratique
                 $groupedResults = [];
@@ -183,15 +201,31 @@
                     echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
+                    echo "<td><button onclick='modifyRow(this)'>Modifier</button></td>";
                     echo "</tr>";
                 }
                 ?>
+
                 </tbody>
         </table>
     </div>
 </div>
 <div class="export-button">
-        <button class="button primary">Exporter le Tableau</button>
+    <form action="../Python/export.php" method="post">
+        <input type="hidden" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>">
+        <input type="hidden" name="program" value="<?php echo htmlspecialchars($program); ?>">
+        <input type="hidden" name="phase" value="<?php echo htmlspecialchars($phase); ?>">
+        
+        <label for="format">Format:</label>
+        <select name="format" id="format">
+            <option value="Excel">CSV</option>
+            <option value="PDF">PDF</option>
+        </select>
+        
+        <button type="submit" class="button primary">Exporter le Tableau</button>
+    </form>
+</div>
+
 </div>
 </body>
 </html>

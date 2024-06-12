@@ -29,6 +29,19 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<style>
+    .requirements-container {
+      position: fixed;
+      top: 20px;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      z-index: 1000;
+      width: 250px; /* Ajustez la largeur selon vos besoins */
+      font-size: 12px;
+    }
+</style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/Styles/admin.css">
@@ -74,18 +87,38 @@
 
         <label for="role">Role:</label>
         <select id="role" name="role">
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
+            <option value="0">User</option>
+            <option value="1">Admin</option>
         </select>
 
         <button type="submit"> Add User </button>
     </form>
 
 </div>
+<?php
+    // Get the current password requirements from the database
+    $stmt = $bd->prepare("SELECT * FROM PasswordRequirements");
+    $stmt->execute();
+    $requirements = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $n = $requirements['n']; // Number of numeric characters
+    $p = $requirements['p']; // Number of lowercase alphabetic characters
+    $q = $requirements['q']; // Number of uppercase alphabetic characters
+    $r = $requirements['r']; // Number of special characters
+?>
+ <div class="requirements-container">
+    <h3>Exigences du mot de passe</h3>
+    <p>Nombre de caractères numériques : <?php echo $n; ?></p>
+    <p>Nombre de caractères alphabétiques minuscules : <?php echo $p; ?></p>
+    <p>Nombre de caractères alphabétiques majuscules : <?php echo $q; ?></p>
+    <p>Nombre de caractères spéciaux : <?php echo $r; ?></p>
+  </div>
+
 <div class="menu">
     <a href="admin_users_list.php">Listes des utilisateurs</a>
     <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="admin_banned_users.php">Modifier mot de passe verrouillé</a>
+    <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="admin_add_bp.php">Ajouter une bonne pratique</a>
 </div>
 <div class="content">
     <table>

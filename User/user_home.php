@@ -6,8 +6,6 @@
   <link rel="stylesheet" href="/Styles/user.css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   
-  
- 
      <title>Rebooters Search</title>
 </head>
 <body>
@@ -30,7 +28,6 @@
         </div>
       </div>
 </nav>
-
 
 </section>
 <div class="search-container">
@@ -59,13 +56,14 @@
         <label for="phase">Phase</label>
         <?php
         // Prepare the SQL query
-        $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases");
+            $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases ORDER BY FIELD(NomPhase, 'préparation', 'codage', 'exécution', 'analyse')");
 
-        // Execute the query
-        $query->execute();
+            // Exécution de la requête
+            $query->execute();
 
-        // Fetch the results
-        $phases = $query->fetchAll(PDO::FETCH_COLUMN);
+            // Récupération des résultats
+            $phases = $query->fetchAll(PDO::FETCH_COLUMN);
+
         ?>
         <select name="phase">
             <option value="">Phase</option>
@@ -78,11 +76,10 @@
             <i class="fa fa-search"></i> 
         </button>
     </form>
-    <a href="admin_home.php" class="reset-button" style="margin-left: 10px;">
+    <a href="user_home.php" class="reset-button" style="margin-left: 10px;">
         <i class="fa fa-refresh"></i> 
     </a>
 </div>
-
 <div class="container">
     <h2 class="results-title">Résultats</h2>
     <div class="table-container">
@@ -93,67 +90,82 @@
                                 <th>Phase</th>
                                 <th>Description</th>
                                 <th>Mots Clés</th>
+                                <th>Modification</th>
+
                         </tr>
                 </thead>
                 <tbody>
                 <?php
 
+            
+
                 $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
+                strpos($keyword, ',') !== false ? $keywords = explode(',', $keyword) : $keywords = [$keyword];
                 $program = isset($_GET['program']) ? $_GET['program'] : '';
                 $phase = isset($_GET['phase']) ? $_GET['phase'] : '';
 
-                // Prepare SQL query
-                // Prepare SQL query
-                $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
-                FROM PratiqueProg
-                INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
-                INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
-                INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
-                INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique";
+                // Préparation de la requête SQL
+                    $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
+                    FROM PratiqueProg
+                    INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+                    INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
+                    INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
+                    INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
+                    INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+                    INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique";
 
-                // Add keyword to the query if specified
-                if ($keyword !== '') {
-                    $sql .= " WHERE BonnesPratiques.IDBonnePratique IN (
-                        SELECT PratiqueMotsCles.IDBonnePratique
-                        FROM PratiqueMotsCles
-                        INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                        WHERE MotsCles.NomMotsCles = :keyword
-                    )";
-                }
+                    $conditions = [];
+                    $params = [];
 
-                // Add program to the query if specified
-                if ($program !== '') {
-                    $sql .= ($keyword !== '') ? " AND" : " WHERE";
-                    $sql .= " BonnesPratiques.IDBonnePratique IN (
-                        SELECT PratiqueProg.IDBonnePratique
-                        FROM PratiqueProg
-                        INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                        WHERE Programmes.NomProgramme = :program
-                    )";
-                }
+                    // Ajout des conditions de recherche par mot clé
+                    if ($keyword !== '') {
+                    $placeholders = implode(',', array_fill(0, count($keywords), '?'));
+                    $conditions[] = "BonnesPratiques.IDBonnePratique IN (
+                                    SELECT PratiqueMotsCles.IDBonnePratique
+                                    FROM PratiqueMotsCles
+                                    INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+                                    WHERE MotsCles.NomMotsCles IN ($placeholders)
+                                )";
+                    foreach ($keywords as $word) {
+                    $params[] = trim($word);
+                    }
+                    }
 
-                // Add phase to the query if specified
-                if ($phase !== '') {
-                    $sql .= ($keyword !== '' || $program !== '') ? " AND" : " WHERE";
-                    $sql .= " Phases.NomPhase = :phase";
-                }
+                    // Ajout des conditions de recherche par programme
+                    if ($program !== '') {
+                    $conditions[] = "BonnesPratiques.IDBonnePratique IN (
+                                    SELECT PratiqueProg.IDBonnePratique
+                                    FROM PratiqueProg
+                                    INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+                                    WHERE Programmes.NomProgramme = ? OR Programmes.NomProgramme = 'GENERIC'
+                                )";
+                    $params[] = $program;
+                    }
 
-                $stmt = $bd->prepare($sql);
+                    // Ajout des conditions de recherche par phase
+                    if ($phase !== '') {
+                    $conditions[] = "Phases.NomPhase = ?";
+                    $params[] = $phase;
+                    }
 
-                if ($keyword !== '') {
-                    $stmt->bindValue(':keyword', $keyword);
-                }
-                if ($program !== '') {
-                    $stmt->bindValue(':program', $program);
-                }
-                if ($phase !== '') {
-                    $stmt->bindValue(':phase', $phase);
-                }
+                    // Concaténation des conditions avec 'WHERE' ou 'AND' selon le cas
+                    if (!empty($conditions)) {
+                    $sql .= ' WHERE ' . implode(' AND ', $conditions);
+                    }
 
-                $stmt->execute();
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    // Ajout du tri par phase
+                    $sql .= " ORDER BY FIELD(Phases.NomPhase, 'préparation', 'codage', 'exécution', 'analyse')";
+
+                    $stmt = $bd->prepare($sql);
+
+                    // Liaison des paramètres
+                    foreach ($params as $index => $param) {
+                    $stmt->bindValue($index + 1, $param);
+                    }
+
+                    $stmt->execute();
+                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
                 // Group results by IDBonnePratique
                 $groupedResults = [];
@@ -182,16 +194,46 @@
                     echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
+                    echo "<td><a href='user_home.php?id=" . $row['IDBonnePratique'] . "'>Modifier</a></td>";                    
                     echo "</tr>";
                 }
                 ?>
+                <!-- Vérification si le paramètre "id" est défini -->
+                <?php if (isset($_GET['id'])): ?>
+                    <?php
+                    // Récupération de l'ID de la bonne pratique à modifier
+                    $id = $_GET['id'];
+
+                    // Requête pour récupérer les détails de la bonne pratique à modifier
+                    $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
+                            FROM BonnesPratiques
+                            INNER JOIN PratiqueProg ON BonnesPratiques.IDBonnePratique = PratiqueProg.IDBonnePratique
+                            INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+                            INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
+                            INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
+                            INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
+                            INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+                            WHERE BonnesPratiques.IDBonnePratique = ?";
+                    $stmt = $bd->prepare($sql);
+                    $stmt->execute([$id]);
+                    $pratique = $stmt->fetch();
+                    ?>
+
+                    <!-- Formulaire de modification pré-rempli avec les détails de la bonne pratique -->
+                    <form method="post" action="update_bp.php">
+                        <input type="hidden" name="id" value="<?php echo $pratique['IDBonnePratique']; ?>">
+                        <input type="text" name="description" value="<?php echo $pratique['Description']; ?>">
+                        <!-- Ajoutez d'autres champs pour les autres détails de la pratique -->
+                        <input type="submit" value="Mettre à jour">
+                    </form>
+                <?php endif; ?>
+
                 </tbody>
         </table>
     </div>
 </div>
-      <div class="export-button">
+<div class="export-button">
         <button class="button primary">Exporter le Tableau</button>
-      </div>
-
+</div>
 </body>
 </html>
