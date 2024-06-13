@@ -2,7 +2,6 @@
 session_start();
 include("../Database/base.php");
 
-// Vérifiez si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit;
@@ -10,7 +9,7 @@ if (!isset($_SESSION['username'])) {
 
 $currentUsername = $_SESSION['username'];
 
-// Préparez et exécutez la requête SQL pour les utilisateurs
+
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -23,7 +22,7 @@ foreach ($users as $index => $user) {
     }
 }
 
-// Ajouter un programme
+
 if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
     $newProgram = trim($_POST['new_program']);
     if (!empty($newProgram)) {
@@ -44,14 +43,14 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
     }
 }
 
-// Supprimer un programme
+
 if (isset($_POST['action']) && $_POST['action'] == 'delete_program') {
     $programId = $_POST['program_id'];
     $query = $bd->prepare("DELETE FROM Programmes WHERE IDProgramme = :program_id");
     $query->execute([':program_id' => $programId]);
 }
 
-// Requête SQL pour les programmes distincts
+
 $programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes WHERE TRIM(NomProgramme) != ''");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);

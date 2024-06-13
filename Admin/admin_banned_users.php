@@ -5,19 +5,19 @@
     
     $currentUsername = $_SESSION['username'];
 
-    // Préparez et exécutez la requête SQL
+    
     $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
     $stmt->execute();
 
-    // Récupérez tous les résultats
+    
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($users as $index => $user) {
         if ($user['NomUtilisateur'] === $currentUsername) {
-            // Retirez l'utilisateur de sa position actuelle
+            
             unset($users[$index]);
 
-            // Ajoutez l'utilisateur au début du tableau
+          
             array_unshift($users, $user);
 
             break;
@@ -88,7 +88,7 @@
 </form>   
 </section>
 
-<!-- Votre section de résultats ici -->
+
  
  <div class="container">
   <h2 class="results-title">Résultats</h2>
@@ -163,7 +163,7 @@
           
          
       
-            <!-- Répétez pour les autres objets -->
+            
         </tbody>
     </table>
 </div>

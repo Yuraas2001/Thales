@@ -7,8 +7,6 @@ $currentUsername = $_SESSION['username'];
 // Préparez et exécutez la requête SQL pour les utilisateurs
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
-
-// Récupérez tous les résultats
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($users as $index => $user) {
@@ -17,6 +15,13 @@ foreach ($users as $index => $user) {
         array_unshift($users, $user);
         break;
     }
+}
+
+// Supprimer temporairement une bonne pratique
+if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
+    $delete_id = $_POST['id'];
+    $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 1 WHERE IDBonnePratique = :id");
+    $query->execute([':id' => $delete_id]);
 }
 ?>
 
@@ -32,23 +37,23 @@ foreach ($users as $index => $user) {
 </head>
 <body>
 <nav>
-        <div class="logo">
-                <img src="Images/logo.svg" alt="REBOOTERS Logo" height="200" >
-        </div>
-        <div>
-                <div class="user-menu">
-                <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
-                    <button class="user-button">☰</button>
-                    <div class="user-dropdown">
-                        <a href="../Database/deconnex.php">Se déconnecter</a>
-                    </div>
-                </div>
+    <div class="logo">
+        <img src="/Images/logo.svg" alt="REBOOTERS Logo" height="200">
+    </div>
+    <div>
+        <div class="user-menu">
+            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
+            <button class="user-button">☰</button>
+            <div class="user-dropdown">
+                <a href="../Database/deconnex.php">Se déconnecter</a>
             </div>
+        </div>
+    </div>
 </nav>
 <div class="menu">
-  <a href="superadmin_users_list.php">Listes des utilisateurs</a>
-  <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
-  <a href="superadmin_editprog.php">Modifier un programme</a>
+    <a href="superadmin_users_list.php">Listes des utilisateurs</a>
+    <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
+    <a href="superadmin_editprog.php">Modifier un programme</a>
 </div>
 <style>
 .reset-button {
@@ -57,43 +62,33 @@ foreach ($users as $index => $user) {
 </style>
 
 <div class="search-container">
-    <form action="admin_home.php" method="get">
+    <form action="superadmin_home.php" method="get">
         <input type="text" name="keyword" placeholder="Entrer un mot clé...">
         
         <label for="program">Programme</label>
         <?php
         include '../Database/base.php';
-        // Prepare the SQL query
         $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
-
-        // Execute the query
         $query->execute();
-
-        // Fetch the results
         $programmes = $query->fetchAll(PDO::FETCH_COLUMN);
         ?>
         <select name="program">
             <option value="">Programme</option>
             <?php foreach ($programmes as $programme): ?>
-                <option value="<?php echo $programme; ?>"><?php echo $programme; ?></option>
+                <option value="<?php echo htmlspecialchars($programme); ?>"><?php echo htmlspecialchars($programme); ?></option>
             <?php endforeach; ?>
         </select>
 
         <label for="phase">Phase</label>
         <?php
-        // Prepare the SQL query
         $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases");
-
-        // Execute the query
         $query->execute();
-
-        // Fetch the results
         $phases = $query->fetchAll(PDO::FETCH_COLUMN);
         ?>
         <select name="phase">
             <option value="">Phase</option>
             <?php foreach ($phases as $phase): ?>
-                <option value="<?php echo $phase; ?>"><?php echo $phase; ?></option>
+                <option value="<?php echo htmlspecialchars($phase); ?>"><?php echo htmlspecialchars($phase); ?></option>
             <?php endforeach; ?>
         </select>
 
@@ -101,9 +96,10 @@ foreach ($users as $index => $user) {
             <i class="fa fa-search"></i> 
         </button>
     </form>
-    <a href="admin_home.php" class="reset-button" style="margin-left: 10px;">
+    <a href="superadmin_home.php" class="reset-button" style="margin-left: 10px;">
         <i class="fa fa-refresh"></i> 
     </a>
+    
 </div>
 
 <div class="container">
@@ -116,6 +112,7 @@ foreach ($users as $index => $user) {
                                 <th>Phase</th>
                                 <th>Description</th>
                                 <th>Mots Clés</th>
+                                
                         </tr>
                 </thead>
                 <tbody>
@@ -129,20 +126,18 @@ foreach ($users as $index => $user) {
                 $program = isset($_GET['program']) ? $_GET['program'] : '';
                 $phase = isset($_GET['phase']) ? $_GET['phase'] : '';
 
-                // Prepare SQL query
-                // Prepare SQL query
                 $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
-                FROM PratiqueProg
-                INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
-                INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
-                INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
-                INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique";
+                        FROM PratiqueProg
+                        INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+                        INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
+                        INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
+                        INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
+                        INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+                        INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique
+                        WHERE BonnesPratiques.Etat = 0"; // Exclure les bonnes pratiques marquées comme supprimées
 
-                // Add keyword to the query if specified
                 if ($keyword !== '') {
-                    $sql .= " WHERE BonnesPratiques.IDBonnePratique IN (
+                    $sql .= " AND BonnesPratiques.IDBonnePratique IN (
                         SELECT PratiqueMotsCles.IDBonnePratique
                         FROM PratiqueMotsCles
                         INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
@@ -150,10 +145,8 @@ foreach ($users as $index => $user) {
                     )";
                 }
 
-                // Add program to the query if specified
                 if ($program !== '') {
-                    $sql .= ($keyword !== '') ? " AND" : " WHERE";
-                    $sql .= " BonnesPratiques.IDBonnePratique IN (
+                    $sql .= " AND BonnesPratiques.IDBonnePratique IN (
                         SELECT PratiqueProg.IDBonnePratique
                         FROM PratiqueProg
                         INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
@@ -161,10 +154,8 @@ foreach ($users as $index => $user) {
                     )";
                 }
 
-                // Add phase to the query if specified
                 if ($phase !== '') {
-                    $sql .= ($keyword !== '' || $program !== '') ? " AND" : " WHERE";
-                    $sql .= " Phases.NomPhase = :phase";
+                    $sql .= " AND Phases.NomPhase = :phase";
                 }
 
                 $stmt = $bd->prepare($sql);
@@ -182,7 +173,6 @@ foreach ($users as $index => $user) {
                 $stmt->execute();
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                // Group results by IDBonnePratique
                 $groupedResults = [];
                 foreach ($results as $row) {
                     $id = $row['IDBonnePratique'];
@@ -209,7 +199,7 @@ foreach ($users as $index => $user) {
                     echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
-                    echo "</tr>";
+                    
                 }
                 ?>
                 </tbody>

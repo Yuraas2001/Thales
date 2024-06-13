@@ -2,20 +2,20 @@
 session_start();
 include("../Database/base.php");
 
-
+// Vérifiez si l'utilisateur est connecté
 if (!isset($_SESSION['username'])) {
-    
+    // Redirigez l'utilisateur vers la page de connexion s'il n'est pas connecté
     header("Location: login.php");
     exit;
 }
 
 $currentUsername = $_SESSION['username'];
 
-
+// Préparez et exécutez la requête SQL pour les utilisateurs
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 
-
+// Récupérez tous les résultats
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($users as $index => $user) {
@@ -28,12 +28,12 @@ foreach ($users as $index => $user) {
 
 $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 
-
+// Requête SQL pour les programmes avec DISTINCT pour éviter les doublons
 $programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_COLUMN);
 
-
+// Check if an action is triggered
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $id = $_POST['id'];
     $action = $_POST['action'];
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $query->execute([':id' => $id]);
     }
 
-    
+    // Refresh the page to reflect changes
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         </thead>
         <tbody>
         <?php
-        
+        // Préparez la requête SQL
         $stmt = $bd->prepare("
           SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles, BonnesPratiques.Etat
           FROM PratiqueProg
@@ -133,13 +133,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique
         ");
 
-       
+        // Exécutez la requête
         $stmt->execute();
 
-      
+        // Récupérez les résultats
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-       
+        // Regroupez les résultats par bonne pratique, programme et mot clé
         $groupedResults = [];
         foreach ($results as $row) {
           $id = $row['IDBonnePratique'];
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           }
         }
 
-        
+        // Parcourez les résultats groupés et créez des lignes de tableau
         foreach ($groupedResults as $row) {
           $status = $row['Etat'] ? "<span style='color: red;'>Supprimé</span>" : "Actif";
           echo "<tr>";
@@ -175,10 +175,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                       " . ($row['Etat'] ? "<button type='submit' name='action' value='restore'>Restaurer</button>" : "") . "
                       <button type='submit' name='action' value='permanent_delete'>Suppression Définitive</button>
                   </form>
-                  <form method='post' action='modify1_bp.php' style='display:inline;'>
-                  <input type='hidden' name='modify_id' value='" . $row['IDBonnePratique'] . "'>
-                  <button type='submit'>Modifier</button>
-              </form>
+                  <form method='get' action='modify1_bp.php'>
+                      <input type='hidden' name='id' value='" . $row['IDBonnePratique'] . "'>
+                      <button type='submit'>Modifier</button>
+                  </form>
                 </td>";
           echo "</tr>";
         }

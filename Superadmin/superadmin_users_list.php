@@ -2,23 +2,33 @@
 session_start();
 include("../Database/base.php");
 
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit;
+}
+
 $currentUsername = $_SESSION['username'];
 
-// Préparez et exécutez la requête SQL
+// Fonction pour filtrer les utilisateurs
+function filterUsers($users, $typeToExclude) {
+    return array_filter($users, function($user) use ($typeToExclude) {
+        return $user['TypeUtilisateur'] != $typeToExclude;
+    });
+}
+
+// Préparez et exécutez la requête SQL pour les utilisateurs
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
-
-// Récupérez tous les résultats
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Filtrer les utilisateurs pour exclure les Superadmins
+$users = filterUsers($users, 2);
 
 foreach ($users as $index => $user) {
     if ($user['NomUtilisateur'] === $currentUsername) {
-        // Retirez l'utilisateur de sa position actuelle
         unset($users[$index]);
-
-        // Ajoutez l'utilisateur au début du tableau
         array_unshift($users, $user);
-
         break;
     }
 }
@@ -32,17 +42,18 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/Styles/admin.css">
+  <link rel="stylesheet" href="/Styles/user_pb.css">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
   <title>Rebooters Search</title>
 </head>
 <body>
 <nav>
     <div class="logo">
-        <img src="Images/logo.svg" alt="REBOOTERS Logo" height="200">
+        <img src="/Images/logo.svg" alt="REBOOTERS Logo" height="200">
     </div>
     <div>
         <div class="user-menu">
-            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a> 
+            <a href="./superadmin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a> 
             <button class="user-button">☰</button>
             <div class="user-dropdown">
                 <a href="../Database/deconnex.php">Se déconnecter</a>
@@ -69,30 +80,28 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
     }
 ?>
 
-<div class="content">
     <h3>Ajouter un utilisateur</h3>
     <form action="../Database/add_user.php" method="post">
-        <label for="username">Username:</label>
+        <label for="username">Nom d'utilisateur:</label>
         <input type="text" id="username" name="username" required>
 
-        <label for="password">Password:</label>
+        <label for="password">Mot de passe:</label>
         <input type="password" id="password" name="password" required>
 
-        <label for="role">Role:</label>
+        <label for="role">Rôle:</label>
         <select id="role" name="role">
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-            <option value="superadmin">Superadmin</option>
+            <option value="user">Utilisateur</option>
+            <option value="admin">Administrateur</option>
         </select>
 
-        <button type="submit">Add User</button>
+        <button type="submit">Ajouter l'utilisateur</button>
     </form>
 </div>
 
 <div class="content">
     <table>
         <tr>
-            <th>Username</th>
+            <th>Nom d'utilisateur</th>
             <th>Rôle</th>
             <th>Bloqué</th>
             <th>Action</th>
@@ -100,7 +109,7 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
         <?php foreach ($users as $user): ?>
             <tr>
                 <td><?php echo htmlspecialchars($user['NomUtilisateur']); ?></td>
-                <td><?php echo $user['TypeUtilisateur'] == 'superadmin' ? 'Superadmin' : ($user['TypeUtilisateur'] == 'admin' ? 'Admin' : 'User'); ?></td>
+                <td><?php echo $user['TypeUtilisateur'] == 1 ? 'Administrateur' : 'Utilisateur'; ?></td>
                 <td><?php echo $user['Bloque'] == 1 ? 'Oui' : ''; ?></td>
                 <td>
                     <?php if ($usernameToModify === $user['NomUtilisateur'] && $currentUsername !== $user['NomUtilisateur']): ?>
@@ -116,14 +125,13 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
                                 <form action="../Database/change_role.php" method="post">
                                     <input type="hidden" name="old_username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
 
-                                    <label for="new_username">New Username:</label>
+                                    <label for="new_username">Nouveau nom d'utilisateur:</label>
                                     <input type="text" id="new_username" name="new_username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
 
-                                    <label for="new_role">New Role:</label>
+                                    <label for="new_role">Nouveau rôle:</label>
                                     <select id="new_role" name="new_role">
-                                        <option value="user" <?php echo $user['TypeUtilisateur'] == 'user' ? 'selected' : ''; ?>>User</option>
-                                        <option value="admin" <?php echo $user['TypeUtilisateur'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
-                                        <option value="superadmin" <?php echo $user['TypeUtilisateur'] == 'superadmin' ? 'selected' : ''; ?>>Superadmin</option>
+                                        <option value="0" <?php echo $user['TypeUtilisateur'] == 0 ? 'selected' : ''; ?>>Utilisateur</option>
+                                        <option value="1" <?php echo $user['TypeUtilisateur'] == 1 ? 'selected' : ''; ?>>Administrateur</option>
                                     </select>
 
                                     <input type="submit" value="Modifier">
@@ -132,18 +140,22 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
                             }
                             ?>
                             <?php if ($user['Bloque'] == 1): ?>
-                                <form action="../Database/superunblock_user.php" method="POST">
+                                <?php if (isset($_GET['unblock']) && $_GET['unblock'] === $user['NomUtilisateur']): ?>
+                                <!-- Formulaire de déblocage d'utilisateur -->
+                                <form action="../Database/unblock_user.php" method="POST">
                                     <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
+                                    Nouveau mot de passe: <input type="password" name="new_password" required>
                                     <button type="submit">Débloquer</button>
                                 </form>
-                            <?php else: ?>
-                                <?php if ($user['NomUtilisateur'] !== $currentUsername): ?>
-                                    <form action="../Database/superblock_user.php" method="POST">
-                                        <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
-                                        <button type="submit">Bloquer</button>
-                                    </form>
+                                <?php else: ?>
+                                    <a href="?unblock=<?php echo urlencode($user['NomUtilisateur']); ?>">Débloquer</a>
                                 <?php endif; ?>
                             <?php endif; ?>
+                            <!-- Le bouton Supprimer -->
+                            <form action="../Database/delete_user.php" method="POST" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
+                                <button type="submit">Supprimer</button>
+                            </form>
                         <?php endif; ?>
                     <?php endif; ?>
                 </td>

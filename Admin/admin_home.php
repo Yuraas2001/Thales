@@ -1,30 +1,3 @@
-<?php
-session_start();
-include("../Database/base.php");
-
-$currentUsername = $_SESSION['username'];
-
-// Préparez et exécutez la requête SQL pour les utilisateurs
-$stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
-$stmt->execute();
-$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-foreach ($users as $index => $user) {
-    if ($user['NomUtilisateur'] === $currentUsername) {
-        unset($users[$index]);
-        array_unshift($users, $user);
-        break;
-    }
-}
-
-// Supprimer temporairement une bonne pratique
-if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
-    $delete_id = $_POST['id'];
-    $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 1 WHERE IDBonnePratique = :id");
-    $query->execute([':id' => $delete_id]);
-}
-?>
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -37,23 +10,25 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
 </head>
 <body>
 <nav>
-    <div class="logo">
-        <img src="/Images/logo.svg" alt="REBOOTERS Logo" height="200">
-    </div>
-    <div>
-        <div class="user-menu">
-            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
-            <button class="user-button">☰</button>
-            <div class="user-dropdown">
-                <a href="../Database/deconnex.php">Se déconnecter</a>
-            </div>
+        <div class="logo">
+                <img src="Images/logo.svg" alt="REBOOTERS Logo" height="200" >
         </div>
-    </div>
+        <div>
+                <div class="user-menu">
+                <a href="./admin_home.php" class="menu-button">Admin</a>
+                    <button class="user-button">☰</button>
+                    <div class="user-dropdown">
+                        <a href="../Database/deconnex.php">Se déconnecter</a>
+                    </div>
+                </div>
+            </div>
 </nav>
 <div class="menu">
     <a href="admin_users_list.php">Listes des utilisateurs</a>
     <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="admin_editprog.php">Modifier un programme</a>
+    <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="admin_add_bp.php">Ajouter une bonne pratique</a>
+
 </div>
 <style>
 .reset-button {
@@ -68,27 +43,37 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
         <label for="program">Programme</label>
         <?php
         include '../Database/base.php';
+     
         $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
+
+      
         $query->execute();
+
         $programmes = $query->fetchAll(PDO::FETCH_COLUMN);
         ?>
         <select name="program">
             <option value="">Programme</option>
             <?php foreach ($programmes as $programme): ?>
-                <option value="<?php echo htmlspecialchars($programme); ?>"><?php echo htmlspecialchars($programme); ?></option>
+                <option value="<?php echo $programme; ?>"><?php echo $programme; ?></option>
             <?php endforeach; ?>
         </select>
 
         <label for="phase">Phase</label>
         <?php
-        $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases");
-        $query->execute();
-        $phases = $query->fetchAll(PDO::FETCH_COLUMN);
+       
+            $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases ORDER BY FIELD(NomPhase, 'préparation', 'codage', 'exécution', 'analyse')");
+
+        
+            $query->execute();
+
+          
+            $phases = $query->fetchAll(PDO::FETCH_COLUMN);
+
         ?>
         <select name="phase">
             <option value="">Phase</option>
             <?php foreach ($phases as $phase): ?>
-                <option value="<?php echo htmlspecialchars($phase); ?>"><?php echo htmlspecialchars($phase); ?></option>
+                <option value="<?php echo $phase; ?>"><?php echo $phase; ?></option>
             <?php endforeach; ?>
         </select>
 
@@ -99,7 +84,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
     <a href="admin_home.php" class="reset-button" style="margin-left: 10px;">
         <i class="fa fa-refresh"></i> 
     </a>
-    
 </div>
 
 <div class="container">
@@ -112,66 +96,81 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                                 <th>Phase</th>
                                 <th>Description</th>
                                 <th>Mots Clés</th>
-                                
+                                <th>Modification</th>
+
                         </tr>
                 </thead>
                 <tbody>
-    <div class="export-button">
-  <a href="export_pdf.php" class="button primary">Exporter en PDF</a>
-  <a href="export_excel.php" class="button primary">Exporter en Excel</a>
-</div>
                 <?php
 
+            
+
                 $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
+                strpos($keyword, ',') !== false ? $keywords = explode(',', $keyword) : $keywords = [$keyword];
                 $program = isset($_GET['program']) ? $_GET['program'] : '';
                 $phase = isset($_GET['phase']) ? $_GET['phase'] : '';
 
-                $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
-                        FROM PratiqueProg
-                        INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                        INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
-                        INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
-                        INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
-                        INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                        INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique
-                        WHERE BonnesPratiques.Etat = 0"; // Exclure les bonnes pratiques marquées comme supprimées
+              
+                    $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
+                    FROM PratiqueProg
+                    INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+                    INNER JOIN PratiquePhases ON PratiqueProg.IDBonnePratique = PratiquePhases.IDBonnePratique
+                    INNER JOIN Phases ON PratiquePhases.IDPhase = Phases.IDPhase
+                    INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
+                    INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+                    INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique";
 
-                if ($keyword !== '') {
-                    $sql .= " AND BonnesPratiques.IDBonnePratique IN (
-                        SELECT PratiqueMotsCles.IDBonnePratique
-                        FROM PratiqueMotsCles
-                        INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
-                        WHERE MotsCles.NomMotsCles = :keyword
-                    )";
-                }
+                    $conditions = [];
+                    $params = [];
+                   
+                    if ($keyword !== '') {
+                    $placeholders = implode(',', array_fill(0, count($keywords), '?'));
+                    $conditions[] = "BonnesPratiques.IDBonnePratique IN (
+                                    SELECT PratiqueMotsCles.IDBonnePratique
+                                    FROM PratiqueMotsCles
+                                    INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
+                                    WHERE MotsCles.NomMotsCles IN ($placeholders)
+                                )";
+                    foreach ($keywords as $word) {
+                    $params[] = trim($word);
+                    }
+                    }
 
-                if ($program !== '') {
-                    $sql .= " AND BonnesPratiques.IDBonnePratique IN (
-                        SELECT PratiqueProg.IDBonnePratique
-                        FROM PratiqueProg
-                        INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
-                        WHERE Programmes.NomProgramme = :program
-                    )";
-                }
+                    
+                    if ($program !== '') {
+                    $conditions[] = "BonnesPratiques.IDBonnePratique IN (
+                                    SELECT PratiqueProg.IDBonnePratique
+                                    FROM PratiqueProg
+                                    INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
+                                    WHERE Programmes.NomProgramme = ? OR Programmes.NomProgramme = 'GENERIC'
+                                )";
+                    $params[] = $program;
+                    }
 
-                if ($phase !== '') {
-                    $sql .= " AND Phases.NomPhase = :phase";
-                }
+                   
+                    if ($phase !== '') {
+                    $conditions[] = "Phases.NomPhase = ?";
+                    $params[] = $phase;
+                    }
 
-                $stmt = $bd->prepare($sql);
+                  
+                    if (!empty($conditions)) {
+                    $sql .= ' WHERE ' . implode(' AND ', $conditions);
+                    }
 
-                if ($keyword !== '') {
-                    $stmt->bindValue(':keyword', $keyword);
-                }
-                if ($program !== '') {
-                    $stmt->bindValue(':program', $program);
-                }
-                if ($phase !== '') {
-                    $stmt->bindValue(':phase', $phase);
-                }
+                 
+                    $sql .= " ORDER BY FIELD(Phases.NomPhase, 'préparation', 'codage', 'exécution', 'analyse')";
 
-                $stmt->execute();
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $stmt = $bd->prepare($sql);
+
+                
+                    foreach ($params as $index => $param) {
+                    $stmt->bindValue($index + 1, $param);
+                    }
+
+                    $stmt->execute();
+                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
                 $groupedResults = [];
                 foreach ($results as $row) {
@@ -199,14 +198,31 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                     echo "<td>" . htmlspecialchars($row['NomPhase']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['Description']) . "</td>";
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
-                    
+                    echo "<td><button onclick='modifyRow(this)'>Modifier</button></td>";
+                    echo "</tr>";
                 }
                 ?>
+
                 </tbody>
         </table>
     </div>
 </div>
+<div class="export-button">
+    <form action="../Python/export.php" method="post">
+        <input type="hidden" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>">
+        <input type="hidden" name="program" value="<?php echo htmlspecialchars($program); ?>">
+        <input type="hidden" name="phase" value="<?php echo htmlspecialchars($phase); ?>">
+        
+        <label for="format">Format:</label>
+        <select name="format" id="format">
+            <option value="Excel">CSV</option>
+            <option value="PDF">PDF</option>
+        </select>
+        
+        <button type="submit" class="button primary">Exporter le Tableau</button>
+    </form>
+</div>
 
-
+</div>
 </body>
 </html>

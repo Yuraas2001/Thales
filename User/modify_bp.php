@@ -96,8 +96,8 @@ if (isset($_POST['modify_id'])) {
             $stmt->execute([':id' => $id, ':phaseId' => $phaseId]);
         }
 
-        echo "Bonne pratique mise à jour avec succès.";
-        echo '<br><a href="user_home.php" class="btn">Retour à la liste</a>';
+        // Redirect to user home page after successful update
+        header("Location: /User/user_home.php");
         exit;
     }
 } else {
