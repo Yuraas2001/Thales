@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Jun 13, 2024 at 04:31 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Hôte : 127.0.0.1:3306
+-- Généré le : jeu. 13 juin 2024 à 19:05
+-- Version du serveur : 8.3.0
+-- Version de PHP : 8.2.18
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,26 +18,28 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `BP`
+-- Base de données : `bp`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `BonnesPratiques`
+-- Structure de la table `bonnespratiques`
 --
 
-CREATE TABLE `BonnesPratiques` (
-  `IDBonnePratique` int(11) NOT NULL,
+DROP TABLE IF EXISTS `bonnespratiques`;
+CREATE TABLE IF NOT EXISTS `bonnespratiques` (
+  `IDBonnePratique` int NOT NULL AUTO_INCREMENT,
   `Description` text NOT NULL,
-  `Etat` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `Etat` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`IDBonnePratique`)
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb3;
 
 --
--- Dumping data for table `BonnesPratiques`
+-- Déchargement des données de la table `bonnespratiques`
 --
 
-INSERT INTO `BonnesPratiques` (`IDBonnePratique`, `Description`, `Etat`) VALUES
+INSERT INTO `bonnespratiques` (`IDBonnePratique`, `Description`, `Etat`) VALUES
 (23, 'creertest <test>avec option c ou p selon besoin', 0),
 (24, 'modini <test>', 0),
 (25, 'Vérifier que les dates dans le .tp correspond au fichier définition dans REF_CONTEXT/<contexte>/definition', 0),
@@ -57,139 +59,114 @@ INSERT INTO `BonnesPratiques` (`IDBonnePratique`, `Description`, `Etat`) VALUES
 (39, 'ana_fonc <test> c v', 0),
 (40, 'réception équipement: liste des documents à demander', 0),
 (41, 'expédition équipement: liste des documents à fournir', 0),
-(42, 'test', 0),
-(43, 'khas', 0);
+(49, 'test8', 0),
+(50, 'PYTHON', 0),
+(51, 'python2', 0),
+(52, 'SIMO', 0),
+(53, 'SIMO2023', 0),
+(57, 'test10', 0),
+(58, 'test20', 0),
+(63, 'TEST400', 1),
+(64, 'q<scsqc', 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `MotsCles`
+-- Structure de la table `motscles`
 --
 
-CREATE TABLE `MotsCles` (
-  `IDMotsCles` int(11) NOT NULL,
-  `NomMotsCles` varchar(60) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+DROP TABLE IF EXISTS `motscles`;
+CREATE TABLE IF NOT EXISTS `motscles` (
+  `IDMotsCles` int NOT NULL AUTO_INCREMENT,
+  `NomMotsCles` varchar(60) NOT NULL,
+  PRIMARY KEY (`IDMotsCles`),
+  UNIQUE KEY `unique_motscles` (`NomMotsCles`)
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb3;
 
 --
--- Dumping data for table `MotsCles`
+-- Déchargement des données de la table `motscles`
 --
 
-INSERT INTO `MotsCles` (`IDMotsCles`, `NomMotsCles`) VALUES
+INSERT INTO `motscles` (`IDMotsCles`, `NomMotsCles`) VALUES
 (25, 'TOUS'),
-(26, 'TOUS'),
+(26, 'PL'),
 (27, ''),
-(28, 'PL'),
-(29, 'POS3'),
-(30, 'TOUS'),
-(31, 'sauf deploiement'),
-(32, 'TOUS'),
-(33, 'MeO'),
-(34, 'post RDP1'),
-(35, 'annulé'),
-(36, 'MeO'),
-(37, 'GPS'),
-(38, 'warmstart'),
-(39, 'TOUS'),
-(40, 'BF GYRO'),
-(41, 'calibration'),
-(42, 'BF GYRO'),
-(43, 'PL'),
-(44, 'PL'),
-(45, 'POS3'),
-(46, 'TOUS'),
-(47, 'PL'),
-(48, 'POS3'),
-(49, 'TOUS'),
-(50, 'TOUS'),
-(51, 'TOUS'),
-(52, 'test'),
-(53, 'test2'),
-(54, 'khas');
+(28, 'POS3'),
+(29, 'sauf deploiement'),
+(30, 'MeO'),
+(31, 'post RDP1'),
+(32, 'annulé'),
+(33, 'GPS'),
+(34, 'warmstart'),
+(35, 'BF GYRO'),
+(36, 'calibration'),
+(37, 'test'),
+(38, 'test2'),
+(39, 'khas');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `PasswordRequirements`
+-- Structure de la table `passwordrequirements`
 --
 
-CREATE TABLE `PasswordRequirements` (
-  `id` int(6) UNSIGNED NOT NULL,
-  `n` int(3) NOT NULL,
-  `p` int(3) NOT NULL,
-  `q` int(3) NOT NULL,
-  `r` int(3) NOT NULL,
-  `reg_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+DROP TABLE IF EXISTS `passwordrequirements`;
+CREATE TABLE IF NOT EXISTS `passwordrequirements` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `n` int NOT NULL,
+  `p` int NOT NULL,
+  `q` int NOT NULL,
+  `r` int NOT NULL,
+  `reg_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `PasswordRequirements`
---
-
-INSERT INTO `PasswordRequirements` (`id`, `n`, `p`, `q`, `r`, `reg_date`) VALUES
-(3, 1, 1, 1, 1, '2024-06-12 17:23:11');
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Phases`
+-- Structure de la table `phases`
 --
 
-CREATE TABLE `Phases` (
-  `IDPhase` int(11) NOT NULL,
-  `NomPhase` enum('Codage','Analyse','Execution','Preparation') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+DROP TABLE IF EXISTS `phases`;
+CREATE TABLE IF NOT EXISTS `phases` (
+  `IDPhase` int NOT NULL AUTO_INCREMENT,
+  `NomPhase` enum('Codage','Analyse','Execution','Preparation') NOT NULL,
+  PRIMARY KEY (`IDPhase`),
+  UNIQUE KEY `unique_phases` (`NomPhase`)
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb3;
 
 --
--- Dumping data for table `Phases`
+-- Déchargement des données de la table `phases`
 --
 
-INSERT INTO `Phases` (`IDPhase`, `NomPhase`) VALUES
+INSERT INTO `phases` (`IDPhase`, `NomPhase`) VALUES
 (20, 'Codage'),
-(21, 'Codage'),
-(22, 'Codage'),
-(23, 'Codage'),
-(24, 'Codage'),
-(25, 'Codage'),
-(26, 'Codage'),
-(27, 'Codage'),
-(28, 'Codage'),
 (29, 'Execution'),
-(30, 'Execution'),
-(31, 'Execution'),
-(32, 'Execution'),
-(33, 'Execution'),
-(34, 'Execution'),
-(35, 'Execution'),
 (36, 'Analyse'),
-(37, 'Preparation'),
-(38, 'Preparation'),
-(39, 'Analyse'),
-(40, 'Preparation');
+(37, 'Preparation');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `PratiqueMotsCles`
+-- Structure de la table `pratiquemotscles`
 --
 
-CREATE TABLE `PratiqueMotsCles` (
-  `IDBonnePratique` int(11) NOT NULL,
-  `IDMotsCles` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+DROP TABLE IF EXISTS `pratiquemotscles`;
+CREATE TABLE IF NOT EXISTS `pratiquemotscles` (
+  `IDBonnePratique` int NOT NULL,
+  `IDMotsCles` int NOT NULL,
+  KEY `fk_motscles` (`IDMotsCles`),
+  KEY `fk_bp` (`IDBonnePratique`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
--- Dumping data for table `PratiqueMotsCles`
+-- Déchargement des données de la table `pratiquemotscles`
 --
 
-INSERT INTO `PratiqueMotsCles` (`IDBonnePratique`, `IDMotsCles`) VALUES
-(23, 25),
-(24, 26),
+INSERT INTO `pratiquemotscles` (`IDBonnePratique`, `IDMotsCles`) VALUES
 (25, 27),
 (26, 28),
 (26, 29),
-(27, 30),
-(27, 31),
 (28, 32),
 (28, 33),
 (29, 34),
@@ -198,317 +175,200 @@ INSERT INTO `PratiqueMotsCles` (`IDBonnePratique`, `IDMotsCles`) VALUES
 (31, 37),
 (31, 38),
 (32, 39),
-(33, 40),
-(33, 41),
-(34, 42),
-(35, 43),
-(36, 44),
-(36, 45),
-(37, 46),
-(38, 47),
-(38, 48),
-(39, 49),
-(40, 50),
-(41, 51),
-(42, 52),
-(42, 53),
-(43, 54);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `PratiquePhases`
---
-
-CREATE TABLE `PratiquePhases` (
-  `IDBonnePratique` int(11) NOT NULL,
-  `IDPhase` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Dumping data for table `PratiquePhases`
---
-
-INSERT INTO `PratiquePhases` (`IDBonnePratique`, `IDPhase`) VALUES
-(23, 20),
-(24, 21),
-(25, 22),
-(26, 23),
-(27, 24),
-(28, 25),
-(29, 26),
-(30, 27),
-(31, 28),
-(32, 29),
-(33, 30),
-(34, 31),
-(35, 32),
-(36, 33),
-(37, 34),
-(38, 35),
-(39, 36),
-(40, 37),
-(41, 38),
-(42, 39),
-(43, 40);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `PratiqueProg`
---
-
-CREATE TABLE `PratiqueProg` (
-  `IDProgramme` int(11) NOT NULL,
-  `IDBonnePratique` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
-
---
--- Dumping data for table `PratiqueProg`
---
-
-INSERT INTO `PratiqueProg` (`IDProgramme`, `IDBonnePratique`) VALUES
-(23, 23),
-(24, 23),
-(25, 24),
-(26, 24),
+(33, 35), -- updated to valid ID
+(34, 36), -- updated to valid ID
+(35, 37), -- updated to valid ID
+(36, 38), -- updated to valid ID
+(37, 39), -- updated to valid ID
+(38, 26), -- updated to valid ID
+(39, 26), -- updated to valid ID
+(40, 26), -- updated to valid ID
+(41, 26), -- updated to valid ID
+(49, 26), -- updated to valid ID
+(50, 26), -- updated to valid ID
+(51, 26), -- updated to valid ID
+(52, 26), -- updated to valid ID
+(57, 25),
 (27, 25),
-(28, 25),
-(29, 26),
-(30, 26),
-(31, 27),
-(32, 27),
-(33, 28),
-(34, 28),
+(27, 31),
+(63, 28),
+(64, 26); -- updated to valid ID
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `pratiquephases`
+--
+
+DROP TABLE IF EXISTS `pratiquephases`;
+CREATE TABLE IF NOT EXISTS `pratiquephases` (
+  `IDBonnePratique` int NOT NULL,
+  `IDPhase` int NOT NULL,
+  KEY `fk_bonnepratiques` (`IDBonnePratique`),
+  KEY `fk_phases` (`IDPhase`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+--
+-- Déchargement des données de la table `pratiquephases`
+--
+
+INSERT INTO `pratiquephases` (`IDBonnePratique`, `IDPhase`) VALUES
+(25, 20), -- updated to valid ID
+(26, 20), -- updated to valid ID
+(28, 20), -- updated to valid ID
+(29, 20), -- updated to valid ID
+(30, 20), -- updated to valid ID
+(31, 20), -- updated to valid ID
+(32, 29),
+(33, 29),
+(34, 29),
 (35, 29),
 (36, 29),
-(37, 30),
-(38, 30),
-(39, 31),
-(40, 31),
-(41, 32),
-(42, 32),
-(43, 33),
-(44, 33),
-(45, 34),
-(46, 34),
-(47, 35),
-(48, 36),
-(49, 37),
-(50, 37),
-(51, 38),
-(52, 39),
-(53, 39),
-(54, 40),
-(55, 41),
-(56, 42),
-(57, 42),
-(58, 43);
+(37, 29),
+(38, 36),
+(39, 36),
+(40, 37),
+(41, 37),
+(57, 20), -- updated to valid ID
+(58, 36),
+(27, 20), -- updated to valid ID
+(63, 29),
+(64, 20); -- updated to valid ID
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Programmes`
+-- Structure de la table `pratiqueprog`
 --
 
-CREATE TABLE `Programmes` (
-  `IDProgramme` int(11) NOT NULL,
-  `NomProgramme` enum('GENERIC','PROG_1','PROG_2','PROG_3') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+DROP TABLE IF EXISTS `pratiqueprog`;
+CREATE TABLE IF NOT EXISTS `pratiqueprog` (
+  `IDProgramme` int NOT NULL,
+  `IDBonnePratique` int NOT NULL,
+  KEY `fk_bonneP` (`IDBonnePratique`),
+  KEY `fk_prog` (`IDProgramme`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
--- Dumping data for table `Programmes`
+-- Déchargement des données de la table `pratiqueprog`
 --
 
-INSERT INTO `Programmes` (`IDProgramme`, `NomProgramme`) VALUES
+INSERT INTO `pratiqueprog` (`IDProgramme`, `IDBonnePratique`) VALUES
+(23, 25), -- updated to valid ID
+(24, 25), -- updated to valid ID
+(23, 26), -- updated to valid ID
+(24, 26), -- updated to valid ID
+(23, 28), -- updated to valid ID
+(24, 28), -- updated to valid ID
+(23, 29), -- updated to valid ID
+(24, 29), -- updated to valid ID
+(23, 30), -- updated to valid ID
+(24, 30), -- updated to valid ID
+(23, 31), -- updated to valid ID
+(24, 31), -- updated to valid ID
+(23, 32), -- updated to valid ID
+(24, 32), -- updated to valid ID
+(23, 33), -- updated to valid ID
+(24, 33), -- updated to valid ID
+(23, 34), -- updated to valid ID
+(24, 34), -- updated to valid ID
+(23, 35), -- updated to valid ID
+(24, 36), -- updated to valid ID
+(23, 37), -- updated to valid ID
+(24, 37), -- updated to valid ID
+(23, 38), -- updated to valid ID
+(24, 39), -- updated to valid ID
+(23, 39), -- updated to valid ID
+(24, 40), -- updated to valid ID
+(23, 41), -- updated to valid ID
+(24, 41), -- updated to valid ID
+(25, 57), -- updated to valid ID
+(23, 27), -- updated to valid ID
+(24, 27), -- updated to valid ID
+(23, 63), -- updated to valid ID
+(24, 63), -- updated to valid ID
+(25, 63); -- updated to valid ID
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `programmes`
+--
+
+DROP TABLE IF EXISTS `programmes`;
+CREATE TABLE IF NOT EXISTS `programmes` (
+  `IDProgramme` int NOT NULL AUTO_INCREMENT,
+  `NomProgramme` varchar(255) NOT NULL,
+  PRIMARY KEY (`IDProgramme`),
+  UNIQUE KEY `unique_programmes` (`NomProgramme`)
+) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8mb3;
+
+--
+-- Déchargement des données de la table `programmes`
+--
+
+INSERT INTO `programmes` (`IDProgramme`, `NomProgramme`) VALUES
 (23, 'PROG_1'),
 (24, 'PROG_2'),
-(25, 'PROG_1'),
-(26, 'PROG_2'),
-(27, 'PROG_1'),
-(28, 'PROG_2'),
-(29, 'PROG_1'),
-(30, 'PROG_2'),
-(31, 'PROG_1'),
-(32, 'PROG_2'),
-(33, 'PROG_1'),
-(34, 'PROG_2'),
-(35, 'PROG_1'),
-(36, 'PROG_2'),
-(37, 'PROG_1'),
-(38, 'PROG_2'),
-(39, 'PROG_1'),
-(40, 'PROG_2'),
-(41, 'PROG_1'),
-(42, 'PROG_2'),
-(43, 'PROG_1'),
-(44, 'PROG_2'),
-(45, 'PROG_1'),
-(46, 'PROG_2'),
-(47, 'PROG_2'),
-(48, 'PROG_2'),
-(49, 'PROG_1'),
-(50, 'PROG_2'),
-(51, 'PROG_2'),
-(52, 'PROG_1'),
-(53, 'PROG_2'),
-(54, 'GENERIC'),
-(55, 'GENERIC'),
-(56, 'GENERIC'),
-(57, 'PROG_1'),
-(58, 'PROG_3');
+(25, 'GENERIC'),
+(26, 'PROG_3');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Utilisateurs`
+-- Structure de la table `utilisateurs`
 --
 
-CREATE TABLE `Utilisateurs` (
-  `IDUtilisateur` int(11) NOT NULL,
+DROP TABLE IF EXISTS `utilisateurs`;
+CREATE TABLE IF NOT EXISTS `utilisateurs` (
+  `IDUtilisateur` int NOT NULL AUTO_INCREMENT,
   `NomUtilisateur` varchar(60) NOT NULL,
   `MotDePasse` varchar(255) NOT NULL,
-  `TypeUtilisateur` tinyint(1) NOT NULL DEFAULT 0,
-  `NBtentative` tinyint(3) NOT NULL DEFAULT 0,
-  `Bloque` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+  `TypeUtilisateur` enum('0','1','2') NOT NULL,
+  `NBtentative` tinyint NOT NULL DEFAULT '0',
+  `Bloque` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`IDUtilisateur`)
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb3;
 
 --
--- Dumping data for table `Utilisateurs`
+-- Déchargement des données de la table `utilisateurs`
 --
 
-INSERT INTO `Utilisateurs` (`IDUtilisateur`, `NomUtilisateur`, `MotDePasse`, `TypeUtilisateur`, `NBtentative`, `Bloque`) VALUES
-(11, 'admin', '$2y$10$m8KAMbBNgX9TV4nzcrx.jO5MnjqahFxVApektFj0B2jfeQW/UQUS6', 1, 0, 0),
-(12, 'khawla', '$2y$10$yqFqAn5V9rQfMtssbJY9rens3d4Reo5iQvK5uoSr4KagfBEn6O9ia', 0, 2, 0),
-(22, 'faysa', '$2y$10$g0LbwDdsn18FZWwk9aIAY.T.MBtlZkX0.OjD2/M.CVNqUW/dRIDg.', 0, 0, 0),
-(24, 'nasser', '$2y$10$7h3dYyr0d.zRPtOd4cgV2.b3T.M0LRt3M3pdSoH8cTIgI7H30G.4u', 1, 1, 0),
-(25, 'cam', '$2y$10$U.TFsfVwI.F.6k1ft2/H9.A/8RzlZdB2ziUY5MqowsYaMM/aJd3SC', 1, 0, 0);
+INSERT INTO `utilisateurs` (`IDUtilisateur`, `NomUtilisateur`, `MotDePasse`, `TypeUtilisateur`, `NBtentative`, `Bloque`) VALUES
+(11, 'admin', '$2y$10$EPAyJStFI03IovEq8M.3FeUZY9QQI/8DqIrSsRiXFEptatWqfoA.e', '0', 0, 0),
+(24, 'nasser', '$2y$10$VIEiNK4ngHOxAC0iPjMIY.Odk.5fimV7na/y/swhQQq0uqBzJnNVC', '1', 0, 0),
+(44, 'qqsq', '$2y$10$5C9yqSstWJzmd3D2Jgoqi.4kmhM6/jG9EvHg5gW.JognFDAsYbMtm', '0', 0, 0),
+(48, 'superadmin', '$2y$10$hMckynK.mFVdU6LhTJ0gfebPSBdvp7bZDN7Ek9f7sfZzf78ZDQHU.', '2', 4, 0),
+(49, 'test', '$2y$10$Tt/1ImNtkonCtjtECWybFuV2dnJjjhjUjG1x37ytwsLo/eE73Cej2', '0', 0, 0),
+(52, 'TEST', '$2y$10$JMB9.5kRTocgLqcLkujajehSugCJfSnougnFFmQqWthZDbNtlzISG', '', 0, 0),
+(54, 'cQCQC', '$2y$10$2hLUQsEqiVWPn/TNt/GfFezuKBBLH4KKnt3rhNVb4i3eNBz4K54ee', '0', 0, 0),
+(55, 'cdsc', '$2y$10$0aWoImr2EPjLykqORFdGNOQNE7nANp0cJT9tM1wN/mlPD7O50mVbq', '0', 0, 0),
+(57, 'faysa', '$2y$10$bLhsWCzRauLIOHnfImlg7.7nxSi0i3tf.utYnh6FGPnpWSHGtlJLK', '', 0, 0);
 
 --
--- Indexes for dumped tables
---
-
---
--- Indexes for table `BonnesPratiques`
---
-ALTER TABLE `BonnesPratiques`
-  ADD PRIMARY KEY (`IDBonnePratique`);
-
---
--- Indexes for table `MotsCles`
---
-ALTER TABLE `MotsCles`
-  ADD PRIMARY KEY (`IDMotsCles`);
-
---
--- Indexes for table `PasswordRequirements`
---
-ALTER TABLE `PasswordRequirements`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `Phases`
---
-ALTER TABLE `Phases`
-  ADD PRIMARY KEY (`IDPhase`);
-
---
--- Indexes for table `PratiqueMotsCles`
---
-ALTER TABLE `PratiqueMotsCles`
-  ADD KEY `fk_motscles` (`IDMotsCles`),
-  ADD KEY `fk_bp` (`IDBonnePratique`);
-
---
--- Indexes for table `PratiquePhases`
---
-ALTER TABLE `PratiquePhases`
-  ADD KEY `fk_bonnepratiques` (`IDBonnePratique`),
-  ADD KEY `fk_phases` (`IDPhase`);
-
---
--- Indexes for table `PratiqueProg`
---
-ALTER TABLE `PratiqueProg`
-  ADD KEY `fk_bonneP` (`IDBonnePratique`),
-  ADD KEY `fk_prog` (`IDProgramme`);
-
---
--- Indexes for table `Programmes`
---
-ALTER TABLE `Programmes`
-  ADD PRIMARY KEY (`IDProgramme`);
-
---
--- Indexes for table `Utilisateurs`
---
-ALTER TABLE `Utilisateurs`
-  ADD PRIMARY KEY (`IDUtilisateur`);
-
---
--- AUTO_INCREMENT for dumped tables
+-- Contraintes pour les tables déchargées
 --
 
 --
--- AUTO_INCREMENT for table `BonnesPratiques`
+-- Contraintes pour la table `pratiquemotscles`
 --
-ALTER TABLE `BonnesPratiques`
-  MODIFY `IDBonnePratique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+ALTER TABLE `pratiquemotscles`
+  ADD CONSTRAINT `fk_bp` FOREIGN KEY (`IDBonnePratique`) REFERENCES `bonnespratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_motscles` FOREIGN KEY (`IDMotsCles`) REFERENCES `motscles` (`IDMotsCles`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- AUTO_INCREMENT for table `MotsCles`
+-- Contraintes pour la table `pratiquephases`
 --
-ALTER TABLE `MotsCles`
-  MODIFY `IDMotsCles` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+ALTER TABLE `pratiquephases`
+  ADD CONSTRAINT `fk_bonnepratiques` FOREIGN KEY (`IDBonnePratique`) REFERENCES `bonnespratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_phases` FOREIGN KEY (`IDPhase`) REFERENCES `phases` (`IDPhase`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- AUTO_INCREMENT for table `PasswordRequirements`
+-- Contraintes pour la table `pratiqueprog`
 --
-ALTER TABLE `PasswordRequirements`
-  MODIFY `id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `Phases`
---
-ALTER TABLE `Phases`
-  MODIFY `IDPhase` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
-
---
--- AUTO_INCREMENT for table `Programmes`
---
-ALTER TABLE `Programmes`
-  MODIFY `IDProgramme` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
-
---
--- AUTO_INCREMENT for table `Utilisateurs`
---
-ALTER TABLE `Utilisateurs`
-  MODIFY `IDUtilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `PratiqueMotsCles`
---
-ALTER TABLE `PratiqueMotsCles`
-  ADD CONSTRAINT `fk_bp` FOREIGN KEY (`IDBonnePratique`) REFERENCES `BonnesPratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_motscles` FOREIGN KEY (`IDMotsCles`) REFERENCES `MotsCles` (`IDMotsCles`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `PratiquePhases`
---
-ALTER TABLE `PratiquePhases`
-  ADD CONSTRAINT `fk_bonnepratiques` FOREIGN KEY (`IDBonnePratique`) REFERENCES `BonnesPratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_phases` FOREIGN KEY (`IDPhase`) REFERENCES `Phases` (`IDPhase`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `PratiqueProg`
---
-ALTER TABLE `PratiqueProg`
-  ADD CONSTRAINT `fk_bonneP` FOREIGN KEY (`IDBonnePratique`) REFERENCES `BonnesPratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_prog` FOREIGN KEY (`IDProgramme`) REFERENCES `Programmes` (`IDProgramme`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `pratiqueprog`
+  ADD CONSTRAINT `fk_bonneP` FOREIGN KEY (`IDBonnePratique`) REFERENCES `bonnespratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_prog` FOREIGN KEY (`IDProgramme`) REFERENCES `programmes` (`IDProgramme`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
