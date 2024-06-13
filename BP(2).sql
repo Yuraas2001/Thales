@@ -350,25 +350,114 @@ INSERT INTO `utilisateurs` (`IDUtilisateur`, `NomUtilisateur`, `MotDePasse`, `Ty
 --
 
 --
--- Contraintes pour la table `pratiquemotscles`
+- Indexes for table `BonnesPratiques`
 --
-ALTER TABLE `pratiquemotscles`
-  ADD CONSTRAINT `fk_bp` FOREIGN KEY (`IDBonnePratique`) REFERENCES `bonnespratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_motscles` FOREIGN KEY (`IDMotsCles`) REFERENCES `motscles` (`IDMotsCles`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `BonnesPratiques`
+  ADD PRIMARY KEY (`IDBonnePratique`);
 
 --
--- Contraintes pour la table `pratiquephases`
+-- Indexes for table `MotsCles`
 --
-ALTER TABLE `pratiquephases`
-  ADD CONSTRAINT `fk_bonnepratiques` FOREIGN KEY (`IDBonnePratique`) REFERENCES `bonnespratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_phases` FOREIGN KEY (`IDPhase`) REFERENCES `phases` (`IDPhase`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `MotsCles`
+  ADD PRIMARY KEY (`IDMotsCles`);
 
 --
--- Contraintes pour la table `pratiqueprog`
+-- Indexes for table `Phases`
 --
-ALTER TABLE `pratiqueprog`
-  ADD CONSTRAINT `fk_bonneP` FOREIGN KEY (`IDBonnePratique`) REFERENCES `bonnespratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_prog` FOREIGN KEY (`IDProgramme`) REFERENCES `programmes` (`IDProgramme`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Phases`
+  ADD PRIMARY KEY (`IDPhase`);
+
+--
+-- Indexes for table `PratiqueMotsCles`
+--
+ALTER TABLE `PratiqueMotsCles`
+  ADD KEY `fk_motscles` (`IDMotsCles`),
+  ADD KEY `fk_bp` (`IDBonnePratique`);
+
+--
+-- Indexes for table `PratiquePhases`
+--
+ALTER TABLE `PratiquePhases`
+  ADD KEY `fk_bonnepratiques` (`IDBonnePratique`),
+  ADD KEY `fk_phases` (`IDPhase`);
+
+--
+-- Indexes for table `PratiqueProg`
+--
+ALTER TABLE `PratiqueProg`
+  ADD KEY `fk_bonneP` (`IDBonnePratique`),
+  ADD KEY `fk_prog` (`IDProgramme`);
+
+--
+-- Indexes for table `Programmes`
+--
+ALTER TABLE `Programmes`
+  ADD PRIMARY KEY (`IDProgramme`);
+
+--
+-- Indexes for table `Utilisateurs`
+--
+ALTER TABLE `Utilisateurs`
+  ADD PRIMARY KEY (`IDUtilisateur`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `BonnesPratiques`
+--
+ALTER TABLE `BonnesPratiques`
+  MODIFY `IDBonnePratique` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+
+--
+-- AUTO_INCREMENT for table `MotsCles`
+--
+ALTER TABLE `MotsCles`
+  MODIFY `IDMotsCles` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+
+--
+-- AUTO_INCREMENT for table `Phases`
+--
+ALTER TABLE `Phases`
+  MODIFY `IDPhase` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `Programmes`
+--
+ALTER TABLE `Programmes`
+  MODIFY `IDProgramme` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+
+--
+-- AUTO_INCREMENT for table `Utilisateurs`
+--
+ALTER TABLE `Utilisateurs`
+  MODIFY `IDUtilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `PratiqueMotsCles`
+--
+ALTER TABLE `PratiqueMotsCles`
+  ADD CONSTRAINT `fk_bp` FOREIGN KEY (`IDBonnePratique`) REFERENCES `BonnesPratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_motscles` FOREIGN KEY (`IDMotsCles`) REFERENCES `MotsCles` (`IDMotsCles`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `PratiquePhases`
+--
+ALTER TABLE `PratiquePhases`
+  ADD CONSTRAINT `fk_bonnepratiques` FOREIGN KEY (`IDBonnePratique`) REFERENCES `BonnesPratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_phases` FOREIGN KEY (`IDPhase`) REFERENCES `Phases` (`IDPhase`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `PratiqueProg`
+--
+ALTER TABLE `PratiqueProg`
+  ADD CONSTRAINT `fk_bonneP` FOREIGN KEY (`IDBonnePratique`) REFERENCES `BonnesPratiques` (`IDBonnePratique`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_prog` FOREIGN KEY (`IDProgramme`) REFERENCES `Programmes` (`IDProgramme`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
