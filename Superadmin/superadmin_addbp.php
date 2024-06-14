@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../Database/base.php");
+include("../Database/helpers.php"); 
 
 // Check if 'username' key exists in the session
 if (!isset($_SESSION['username'])) {
@@ -50,17 +51,23 @@ $currentUsername = $_SESSION['username']; // Get the current username from sessi
     </div>
     <div>
         <div class="user-menu">
-            <a href="./user_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
+        <a href="./superadmin_home.php" class="menu-button"><?php echo displayUsername($currentUsername, 'superadmin'); ?></a>
             <button class="user-button">☰</button>
             <div class="user-dropdown">
-                <a href="./user_bp.php">Paramètres</a>
-                <a href="./change_password.php">Modifier le mot de passe</a>
+               
+                <a href="./superadmin_changepassword.php">Modifier le mot de passe</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
             </div>
         </div>
     </div>
 </nav>
-
+<div class="menu">
+    <a href="superadmin_users_list.php">Listes des utilisateurs</a>
+    <a href="superadmin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
+    <a href="superadmin_editprog.php">Modifier un programmee</a>
+    <a href="superadmin_addbp.php">Ajouter une bonne pratique</a>
+</div>
 <div class="container">
     <div class="header">
         <h1>Gestion des bonnes pratiques</h1>

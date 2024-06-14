@@ -53,14 +53,20 @@ $currentUsername = $_SESSION['username']; // Get the current username from sessi
             <a href="./user_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
             <button class="user-button">☰</button>
             <div class="user-dropdown">
-                <a href="./user_bp.php">Paramètres</a>
-                <a href="./change_password.php">Modifier le mot de passe</a>
+               
+                <a href="./admin_changepassword.php">Modifier le mot de passe</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
             </div>
         </div>
     </div>
 </nav>
-
+<div class="menu">
+    <a href="admin_users_list.php">Listes des utilisateurs</a>
+    <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="admin_bp.php">Gestion des bonnes pratiques</a>
+    <a href="admin_editprog.php">Modifier un programmee</a>
+    <a href="admin_addbp.php">Ajouter une bonne pratique</a>
+</div>
 <div class="container">
     <div class="header">
         <h1>Gestion des bonnes pratiques</h1>

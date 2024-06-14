@@ -10,7 +10,10 @@ body, html {
     background: #f7f7f7;
     font-family: Arial, sans-serif;
 }
-
+.superadmin {
+    color: red;
+    font-weight: bold; /* Optionnel, pour mettre en gras */
+}
 .logo {
     width: 250px; /* ou la largeur que vous souhaitez */
     height: auto; /* conserve le ratio d'aspect de l'image */

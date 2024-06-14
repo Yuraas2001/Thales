@@ -5,10 +5,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get the form data
     $goodPractice = $_POST['good-practice'];
     $keywords = explode(',', $_POST['keyword']); // Split the keywords into an array
-    $programs = $_POST['program']; //this will be an array
+    $programs = $_POST['program']; // This will be an array
     $phase = $_POST['phase'];
 
-    // Prepare the SQL statement
+    // Prepare the SQL statement for inserting the good practice
     $stmt = $bd->prepare("
         INSERT INTO BonnesPratiques (Description)
         VALUES (:goodPractice)
@@ -23,19 +23,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get the last inserted ID
     $lastId = $bd->lastInsertId();
 
-    // Insert the keyword
+    // Insert the keywords
     foreach ($keywords as $keyword) {
         $keyword = trim($keyword); // Remove any whitespace
 
+        // Check if the keyword already exists
         $stmt = $bd->prepare("
-            INSERT INTO MotsCles (NomMotsCles)
-            VALUES (:keyword)
+            SELECT IDMotsCles FROM MotsCles WHERE NomMotsCles = :keyword
         ");
         $stmt->bindParam(':keyword', $keyword);
         $stmt->execute();
+        $keywordId = $stmt->fetchColumn();
 
-        $keywordId = $bd->lastInsertId();
+        // If the keyword doesn't exist, insert it
+        if (!$keywordId) {
+            $stmt = $bd->prepare("
+                INSERT INTO MotsCles (NomMotsCles)
+                VALUES (:keyword)
+            ");
+            $stmt->bindParam(':keyword', $keyword);
+            $stmt->execute();
+            $keywordId = $bd->lastInsertId();
+        }
 
+        // Link the keyword with the good practice
         $stmt = $bd->prepare("
             INSERT INTO PratiqueMotsCles (IDBonnePratique, IDMotsCles)
             VALUES (:lastId, :keywordId)
@@ -46,15 +57,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert the phase
+    // Check if the phase already exists
     $stmt = $bd->prepare("
-        INSERT INTO Phases (NomPhase)
-        VALUES (:phase)
+        SELECT IDPhase FROM Phases WHERE NomPhase = :phase
     ");
     $stmt->bindParam(':phase', $phase);
     $stmt->execute();
+    $phaseId = $stmt->fetchColumn();
 
-    $phaseId = $bd->lastInsertId();
+    // If the phase doesn't exist, insert it
+    if (!$phaseId) {
+        $stmt = $bd->prepare("
+            INSERT INTO Phases (NomPhase)
+            VALUES (:phase)
+        ");
+        $stmt->bindParam(':phase', $phase);
+        $stmt->execute();
+        $phaseId = $bd->lastInsertId();
+    }
 
+    // Link the phase with the good practice
     $stmt = $bd->prepare("
         INSERT INTO PratiquePhases (IDBonnePratique, IDPhase)
         VALUES (:lastId, :phaseId)
@@ -65,15 +87,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Insert the programs
     foreach ($programs as $program) {
+        // Check if the program already exists
         $stmt = $bd->prepare("
-            INSERT INTO Programmes (NomProgramme)
-            VALUES (:program)
+            SELECT IDProgramme FROM Programmes WHERE NomProgramme = :program
         ");
         $stmt->bindParam(':program', $program);
         $stmt->execute();
+        $programId = $stmt->fetchColumn();
 
-        $programId = $bd->lastInsertId();
+        // If the program doesn't exist, insert it
+        if (!$programId) {
+            $stmt = $bd->prepare("
+                INSERT INTO Programmes (NomProgramme)
+                VALUES (:program)
+            ");
+            $stmt->bindParam(':program', $program);
+            $stmt->execute();
+            $programId = $bd->lastInsertId();
+        }
 
+        // Link the program with the good practice
         $stmt = $bd->prepare("
             INSERT INTO PratiqueProg (IDBonnePratique, IDProgramme)
             VALUES (:lastId, :programId)

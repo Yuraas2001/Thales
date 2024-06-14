@@ -4,33 +4,31 @@ body {
   color: #333;
   line-height: 1.6;
 }
-
-nav {
-  background-color: #979797;
-  color: white;
-  padding: 1rem 0;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  height: 90px;
-}
-
-.menu-button, .user-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: white; 
-  font-size: 1.5rem;
-}
-
-.user-menu {
+  nav {
+    background-color: #979797;
+    color: white;
+    padding: 1rem 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    /* Ajustez la taille du logo et les marges si nécessaire */
+  }
+  /* nav user */
+  .menu-button, .user-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white; 
+    font-size: 1.5rem;
+  }
+  .user-menu {
   position: relative;
   display: inline-block;
 }
@@ -56,64 +54,68 @@ nav {
   display: block;
 }
 
-.search-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #ccc;
-  padding: 2rem;
-  margin-bottom: 1rem;
-  padding-bottom: 20px;
-  padding-top: 20px;
-}
-
+  /* logo */
+  .logo {
+  height: 90px;
+  }
+  .search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    padding: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 20px;
+    padding-top: 20px;
+  }
+  
 .sidebar {
-  position: fixed;
-  width: 200px;
-  height: 100%;
-  background: #333;
-  color: white;
-  padding: 20px;
-  display: none; /* Cache initialement le menu */
+    position: fixed;
+    width: 200px;
+    height: 100%;
+    background: #333;
+    color: white;
+    padding: 20px;
 }
 
-.sidebar h2, .sidebar a {
-  color: #ddd;
-  text-decoration: none;
-  display: block;
-  padding: 10px;
-  margin-top: 10px;
+.sidebar h2 {
+    color: #fff;
+}
+.superadmin {
+  color: red;
+  font-weight: bold; /* Optionnel, pour mettre en gras */
+}
+.sidebar a {
+    color: #ddd;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    margin-top: 10px;
 }
 
 .sidebar a:hover {
-  background-color: #555;
+    background-color: #555;
 }
 
 .content {
-  margin-left: 200px;
-  padding: 20px;
+    margin-left: 200px;
+    
 }
 
 .section {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 th, td {
-  text-align: left;
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-}
-
-.menu {
-  display: flex;
-  justify-content: flex-start; /* Aligne les éléments à gauche */
-  flex-wrap: wrap;
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
 }
 
 .menu a {
@@ -124,6 +126,7 @@ th, td {
   color: white;
   text-decoration: none;
   font-size: 16px;
+
 }
 
 .menu a:hover {
@@ -136,14 +139,26 @@ th, td {
   padding: 10px;
 }
 
+.sidebar {
+  width: 200px;
+  height: 100%;
+  background: #333;
+  color: white;
+  padding: 20px;
+  display: none; /* Cache initialement le menu */
+}
+
 .menu-toggle:checked + .sidebar {
   display: block; /* Montre le menu quand la case est cochée */
 }
+.menu {
 
+margin-left: 95px;
+}
 button {
-  cursor: pointer;
-  padding: 5px 10px;
-  border: none;
-  background-color: #4CAF50;
-  color: white;
+cursor: pointer;
+padding: 5px 10px;
+border: none;
+background-color: #007BFF;
+color: white;
 }

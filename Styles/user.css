@@ -173,7 +173,10 @@ body {
   tr:nth-child(even) {
     background-color: #f9f9f9;
   }
-  
+  .superadmin {
+    color: red;
+    font-weight: bold; /* Optionnel, pour mettre en gras */
+}
   .highlight {
     background-color: #f9f9f9;
     font-weight: bold;
@@ -190,4 +193,8 @@ body {
   .results-title {
     text-align: center;
     margin: 20px 0;
+  }
+  .menu {
+    padding-left: 300px;
+    margin-left: 95px;
   }

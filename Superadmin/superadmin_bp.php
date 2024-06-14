@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../Database/base.php");
+include("../Database/helpers.php"); 
 
 
 if (!isset($_SESSION['username'])) {
@@ -69,21 +70,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
     <div>
         <div class="user-menu">
-            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
+        <a href="./superadmin_home.php" class="menu-button"><?php echo displayUsername($currentUsername, 'superadmin'); ?></a>
             <button class="user-button">☰</button>
             <div class="user-dropdown">
-            <a href="./admin_changepassword.php">Modifier le mot de passe</a>
+            <a href="./superadmin_changepassword.php">Modifier le mot de passe</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
             </div>
         </div>
     </div>
 </nav>
 <div class="menu">
-    <a href="admin_users_list.php">Listes des utilisateurs</a>
-    <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
-    <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="admin_editprog.php">Modifier un programmee</a>
-    <a href="admin_addbp.php">Ajouter une bonne pratique</a>
+    <a href="superadmin_users_list.php">Listes des utilisateurs</a>
+    <a href="superadmin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
+    <a href="superadmin_editprog.php">Modifier un programmee</a>
+    <a href="superadmin_addbp.php">Ajouter une bonne pratique</a>
 </div>
 
 <div class="search-container">
