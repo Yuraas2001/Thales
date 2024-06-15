@@ -67,12 +67,8 @@ if (isset($_POST['modify_id'])) {
                 $stmt->execute([':id' => $id, ':phaseId' => $phaseId]);
             }
 
-            // Redirect to the appropriate home page after successful update
-            if ($userRole == 'admin') {
-                header("Location: /Admin/admin_home.php");
-            } else {
-                header("Location: /User/user_home.php");
-            }
+            // Rediriger vers superadmin_bp.php après une mise à jour réussie
+            header("Location: /Superadmin/superadmin_bp.php");
             exit;
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
@@ -154,11 +150,11 @@ if (isset($_POST['modify_id'])) {
     </div>
     <div>
         <div class="user-menu">
-            <a href="./user_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
+            <a href="./superadmin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
             <button class="user-button">☰</button>
             <div class="user-dropdown">
-                <a href="./user_bp.php">Paramètres</a>
-                <a href="./change_password.php">Modifier le mot de passe</a>
+                <a href="./superadmin_bp.php">Paramètres</a>
+                <a href="./superadmin_changepassword.php">Modifier le mot de passe</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
             </div>
         </div>
@@ -170,7 +166,7 @@ if (isset($_POST['modify_id'])) {
         <h1>Modifier la bonne pratique</h1>
     </div>
 
-    <form action="modify_bp.php" method="post">
+    <form action="superadmin_modify.php" method="post">
         <input type="hidden" name="modify_id" value="<?php echo htmlspecialchars($bp['IDBonnePratique']); ?>">
 
         <div class="form-group">

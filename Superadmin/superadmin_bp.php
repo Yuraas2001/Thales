@@ -1,7 +1,6 @@
 <?php
 session_start();
 include("../Database/base.php");
-include("../Database/helpers.php"); 
 
 
 if (!isset($_SESSION['username'])) {
@@ -70,11 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
     <div>
         <div class="user-menu">
-        <a href="./superadmin_home.php" class="menu-button"><?php echo displayUsername($currentUsername, 'superadmin'); ?></a>
+            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
             <button class="user-button">☰</button>
             <div class="user-dropdown">
             <a href="./superadmin_changepassword.php">Modifier le mot de passe</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
+
             </div>
         </div>
     </div>
@@ -174,15 +174,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
           echo "<td>" . $status . "</td>";
           echo "<td>
-                  <form method='post'>
-                      <input type='hidden' name='id' value='" . $row['IDBonnePratique'] . "'>
-                      " . ($row['Etat'] ? "<button type='submit' name='action' value='restore'>Restaurer</button>" : "") . "
-                      <button type='submit' name='action' value='permanent_delete'>Suppression Définitive</button>
-                  </form>
-                  <form method='post' action='modify1_bp.php' style='display:inline;'>
-                  <input type='hidden' name='modify1_id' value='" . $row['IDBonnePratique'] . "'>
-                  <button type='submit'>Modifier</button>
-              </form>
+          <form method='post' action='superadmin_modify.php' style='display:inline;'>
+          <input type='hidden' name='modify_id' value='" . $row['IDBonnePratique'] . "'>
+          <button type='submit'>Modifier</button>
+      </form>
+      <form method='post'>
+      <input type='hidden' name='id' value='" . $row['IDBonnePratique'] . "'>
+      " . ($row['Etat'] ? "<button type='submit' name='action' value='restore'>Restaurer</button>" : "") . "
+      <button type='submit' name='action' value='permanent_delete'>Suppression Définitive</button>
+  </form>
                 </td>";
           echo "</tr>";
         }

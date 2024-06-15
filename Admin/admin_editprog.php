@@ -1,3 +1,54 @@
+<?php
+session_start();
+include("../Database/base.php");
+
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$currentUsername = $_SESSION['username'];
+$message = "";
+
+// Récupérer les programmes existants
+$programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes WHERE TRIM(NomProgramme) != '' ORDER BY NomProgramme");
+$programStmt->execute();
+$programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Gestion des ajouts et suppressions de programmes
+if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
+    $newProgram = trim($_POST['new_program']);
+    if (!empty($newProgram)) {
+        $checkQuery = $bd->prepare("SELECT * FROM Programmes WHERE NomProgramme = :new_program");
+        $checkQuery->execute([':new_program' => $newProgram]);
+        if ($checkQuery->rowCount() == 0) {
+            $query = $bd->prepare("INSERT INTO Programmes (NomProgramme) VALUES (:new_program)");
+            if ($query->execute([':new_program' => $newProgram])) {
+                $message = "Programme ajouté avec succès.";
+            } else {
+                $message = "Erreur lors de l'ajout du programme.";
+            }
+        } else {
+            $message = "Le programme existe déjà.";
+        }
+    } else {
+        $message = "Le nom du programme ne peut pas être vide.";
+    }
+    // Rafraîchir la liste des programmes après ajout
+    $programStmt->execute();
+    $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+if (isset($_POST['action']) && $_POST['action'] == 'delete_program') {
+    $programName = $_POST['program_name'];
+    $query = $bd->prepare("DELETE FROM Programmes WHERE NomProgramme = :program_name");
+    $query->execute([':program_name' => $programName]);
+    // Rafraîchir la liste des programmes après suppression
+    $programStmt->execute();
+    $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -35,6 +86,9 @@
     <div class="header">
         <div class="program-management">
             <h2>Gestion des Programmes</h2>
+            <?php if (!empty($message)): ?>
+                <p><?php echo htmlspecialchars($message); ?></p>
+            <?php endif; ?>
             <form method="post">
                 <label for="new_program">Ajouter un nouveau programme :</label>
                 <input type="text" name="new_program" id="new_program" required>

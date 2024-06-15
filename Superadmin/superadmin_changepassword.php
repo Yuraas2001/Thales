@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($message): ?>
         <p class="message"><?php echo htmlspecialchars($message); ?></p>
     <?php endif; ?>
-    <form action="change_password.php" method="post">
+    <form action="superadmin_changepassword.php" method="post">
         <div class="form-group">
             <label for="old_password">Ancien mot de passe</label>
             <input type="password" id="old_password" name="old_password" required>
