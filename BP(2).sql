@@ -350,7 +350,7 @@ INSERT INTO `utilisateurs` (`IDUtilisateur`, `NomUtilisateur`, `MotDePasse`, `Ty
 --
 
 --
-- Indexes for table `BonnesPratiques`
+-- Indexes for table `BonnesPratiques`
 --
 ALTER TABLE `BonnesPratiques`
   ADD PRIMARY KEY (`IDBonnePratique`);
