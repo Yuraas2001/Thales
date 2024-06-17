@@ -2,18 +2,19 @@
 session_start();
 include("../Database/base.php");
 include("../Database/helpers.php"); 
-
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
+    // Redirect the user to the login page if they are not logged in
     header("Location: login.php");
     exit;
 }
 
-$currentUsername = $_SESSION['username'];
-
+$currentUsername = $_SESSION['username'];// Get the current username from the session
+// Prepare and execute the query to get user details
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+// Move the current user to the beginning of the users array
 foreach ($users as $index => $user) {
     if ($user['NomUtilisateur'] === $currentUsername) {
         unset($users[$index]);
@@ -21,13 +22,15 @@ foreach ($users as $index => $user) {
         break;
     }
 }
-
+// Handle the form submission for adding a new program
 if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
     $newProgram = trim($_POST['new_program']);
     if (!empty($newProgram)) {
+        // Check if the program already exists
         $checkQuery = $bd->prepare("SELECT * FROM Programmes WHERE NomProgramme = :new_program");
         $checkQuery->execute([':new_program' => $newProgram]);
         if ($checkQuery->rowCount() == 0) {
+            // Insert the new program into the database
             $query = $bd->prepare("INSERT INTO Programmes (NomProgramme) VALUES (:new_program)");
             if ($query->execute([':new_program' => $newProgram])) {
                 echo "Programme ajouté avec succès.";
@@ -41,13 +44,13 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
         echo "Le nom du programme ne peut pas être vide.";
     }
 }
-
+// Handle the form submission for deleting a program
 if (isset($_POST['action']) && $_POST['action'] == 'delete_program') {
     $programName = $_POST['program_name'];
     $query = $bd->prepare("DELETE FROM Programmes WHERE NomProgramme = :program_name");
     $query->execute([':program_name' => $programName]);
 }
-
+// Prepare and execute the query to get distinct program names
 $programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes WHERE TRIM(NomProgramme) != ''");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);

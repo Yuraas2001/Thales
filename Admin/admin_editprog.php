@@ -2,7 +2,7 @@
 session_start();
 include("../Database/base.php");
 
-// Vérifier si l'utilisateur est connecté
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit;
@@ -11,18 +11,20 @@ if (!isset($_SESSION['username'])) {
 $currentUsername = $_SESSION['username'];
 $message = "";
 
-// Récupérer les programmes existants
+// Retrieve existing programs
 $programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes WHERE TRIM(NomProgramme) != '' ORDER BY NomProgramme");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Gestion des ajouts et suppressions de programmes
+// Handle program addition and deletion
 if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
     $newProgram = trim($_POST['new_program']);
     if (!empty($newProgram)) {
+        // Check if the program already exists
         $checkQuery = $bd->prepare("SELECT * FROM Programmes WHERE NomProgramme = :new_program");
         $checkQuery->execute([':new_program' => $newProgram]);
         if ($checkQuery->rowCount() == 0) {
+            // Add the new program to the database
             $query = $bd->prepare("INSERT INTO Programmes (NomProgramme) VALUES (:new_program)");
             if ($query->execute([':new_program' => $newProgram])) {
                 $message = "Programme ajouté avec succès.";
@@ -35,16 +37,17 @@ if (isset($_POST['action']) && $_POST['action'] == 'add_program') {
     } else {
         $message = "Le nom du programme ne peut pas être vide.";
     }
-    // Rafraîchir la liste des programmes après ajout
+    // Refresh the list of programs after addition
     $programStmt->execute();
     $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 if (isset($_POST['action']) && $_POST['action'] == 'delete_program') {
     $programName = $_POST['program_name'];
+    // Delete the selected program from the database
     $query = $bd->prepare("DELETE FROM Programmes WHERE NomProgramme = :program_name");
     $query->execute([':program_name' => $programName]);
-    // Rafraîchir la liste des programmes après suppression
+   // Refresh the list of programs after deletion
     $programStmt->execute();
     $programs = $programStmt->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -76,6 +79,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_program') {
     </div>
 </nav>
 <div class="menu">
+    <!-- Links for navigation in the admin section -->
     <a href="admin_users_list.php">Listes des utilisateurs</a>
     <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
     <a href="admin_bp.php">Gestion des bonnes pratiques</a>
@@ -85,18 +89,21 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_program') {
 <div class="container">
     <div class="header">
         <div class="program-management">
+            <!-- Display a message if it's set -->
             <h2>Gestion des Programmes</h2>
             <?php if (!empty($message)): ?>
                 <p><?php echo htmlspecialchars($message); ?></p>
             <?php endif; ?>
+              <!-- Form to add a new program -->
             <form method="post">
                 <label for="new_program">Ajouter un nouveau programme :</label>
                 <input type="text" name="new_program" id="new_program" required>
                 <button type="submit" name="action" value="add_program">Ajouter</button>
             </form>
-            <h3>Programmes existants :</h3>
+            <h3>Programmes existants :</h3>*<!-- Form to delete an existing program -->
             <form method="post" style="display:inline;">
                 <select id="existing_programs" name="program_name">
+                    <!-- Loop through existing programs and create an option for each -->
                     <?php foreach ($programs as $program): ?>
                         <option value="<?php echo htmlspecialchars($program['NomProgramme']); ?>"><?php echo htmlspecialchars($program['NomProgramme']); ?></option>
                     <?php endforeach; ?>

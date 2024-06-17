@@ -16,6 +16,10 @@ nav {
   color: red;
   font-weight: bold; /* Optionnel, pour mettre en gras */
 }
+.superadmin {
+  color: red;
+  font-weight: bold; /* Optionnel, pour mettre en gras */
+}
 .logo {
   font-size: 1.5rem;
   font-weight: bold;

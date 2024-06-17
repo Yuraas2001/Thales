@@ -2,20 +2,20 @@
 session_start();
 include("../Database/base.php");
 
-// Vérifier si l'utilisateur est connecté
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit;
 }
 
 $currentUsername = $_SESSION['username'];
-$userRole = $_SESSION['role']; // Assurez-vous que le rôle de l'utilisateur est stocké dans la session
+$userRole = $_SESSION['role']; // Ensure the user's role is stored in the session
 
-// Vérifier si l'ID de la bonne pratique à modifier est passé dans la requête
+// Check if the ID of the best practice to be modified is passed in the request
 if (isset($_POST['modify_id'])) {
     $id = $_POST['modify_id'];
 
-    // Vérifier si le formulaire a été soumis pour mettre à jour les détails
+    // Check if the form has been submitted to update the details
     if (isset($_POST['description'])) {
         $description = $_POST['description'];
         $keyword = $_POST['keyword'];
@@ -23,12 +23,12 @@ if (isset($_POST['modify_id'])) {
         $phase = $_POST['phase'];
 
         try {
-            // Mettre à jour la bonne pratique
+            // Update the best practice description
             $stmt = $bd->prepare("UPDATE BonnesPratiques SET Description = :description WHERE IDBonnePratique = :id");
             $stmt->execute([':description' => $description, ':id' => $id]);
 
-            // Mettre à jour les mots clés, programmes et phase
-            // Suppression des entrées existantes
+            // Update the keywords, programs, and phase
+            // Delete existing entries
             $stmt = $bd->prepare("DELETE FROM PratiqueMotsCles WHERE IDBonnePratique = :id");
             $stmt->execute([':id' => $id]);
             $stmt = $bd->prepare("DELETE FROM PratiqueProg WHERE IDBonnePratique = :id");
@@ -36,8 +36,8 @@ if (isset($_POST['modify_id'])) {
             $stmt = $bd->prepare("DELETE FROM PratiquePhases WHERE IDBonnePratique = :id");
             $stmt->execute([':id' => $id]);
 
-            // Ajout des nouvelles entrées
-            // Pour les mots clés, suppose que les mots clés sont séparés par des virgules
+            // Add new entries
+            // For keywords, assume they are separated by commas
             $keywordsArray = explode(',', $keyword);
             foreach ($keywordsArray as $keyword) {
                 $stmt = $bd->prepare("SELECT IDMotsCles FROM MotsCles WHERE NomMotsCles = :keyword");
@@ -67,14 +67,14 @@ if (isset($_POST['modify_id'])) {
                 $stmt->execute([':id' => $id, ':phaseId' => $phaseId]);
             }
 
-            // Rediriger vers superadmin_bp.php après une mise à jour réussie
+            // Redirect to superadmin_bp.php after successful update
             header("Location: /Superadmin/superadmin_bp.php");
             exit;
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
         }
     } else {
-        // Récupérer les détails de la bonne pratique à modifier
+        // Retrieve the details of the best practice to be modified
         $stmt = $bd->prepare("SELECT * FROM BonnesPratiques WHERE IDBonnePratique = :id");
         $stmt->execute([':id' => $id]);
         $bp = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -84,21 +84,22 @@ if (isset($_POST['modify_id'])) {
             exit;
         }
 
-        // Récupérer les mots clés associés à la bonne pratique
+        // Retrieve the keywords associated with the best practice
         $stmt = $bd->prepare("SELECT NomMotsCles FROM MotsCles 
                               INNER JOIN PratiqueMotsCles ON MotsCles.IDMotsCles = PratiqueMotsCles.IDMotsCles 
                               WHERE PratiqueMotsCles.IDBonnePratique = :id");
         $stmt->execute([':id' => $id]);
         $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        // Récupérer les programmes associés à la bonne pratique
+        // Retrieve the programs associated with the best practice
         $stmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes 
                               INNER JOIN PratiqueProg ON Programmes.IDProgramme = PratiqueProg.IDProgramme 
                               WHERE PratiqueProg.IDBonnePratique = :id");
         $stmt->execute([':id' => $id]);
         $programs = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        // Récupérer la phase associée à la bonne pratique
+        
+        // Retrieve the phase associated with the best practice
         $stmt = $bd->prepare("SELECT NomPhase FROM Phases 
                               INNER JOIN PratiquePhases ON Phases.IDPhase = PratiquePhases.IDPhase 
                               WHERE PratiquePhases.IDBonnePratique = :id");
@@ -185,7 +186,7 @@ if (isset($_POST['modify_id'])) {
                 <button type="button">Sélectionner les programmes</button>
                 <div class="dropdown-checkbox-content">
                     <?php
-                    // Récupérer tous les programmes existants sans doublons
+                    // Retrieve all existing programs without duplicates
                     $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
                     $query->execute();
                     $allPrograms = $query->fetchAll(PDO::FETCH_COLUMN);
@@ -204,12 +205,12 @@ if (isset($_POST['modify_id'])) {
             <label for="phase">Phase</label>
             <select id="phase" name="phase">
                 <?php
-                // Préparer la requête SQL pour obtenir les valeurs enum de 'NomPhase'
+                /// Prepare the SQL query to get the enum values of 'NomPhase'
                 $query = $bd->prepare("SHOW COLUMNS FROM Phases LIKE 'NomPhase'");
                 $query->execute();
                 $row = $query->fetch(PDO::FETCH_ASSOC);
 
-                // Extraire les valeurs enum
+                // Extract the variables
                 preg_match("/^enum\(\'(.*)\'\)$/", $row['Type'], $matches);
                 $enum = explode("','", $matches[1]);
 

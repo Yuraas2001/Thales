@@ -5,11 +5,11 @@ include("../Database/helpers.php");
 
 $currentUsername = $_SESSION['username'];
 
-// Préparez et exécutez la requête SQL pour les utilisateurs
+// Prepare and execute the query to get user details
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+// Move the current user to the beginning of the users array
 foreach ($users as $index => $user) {
     if ($user['NomUtilisateur'] === $currentUsername) {
         unset($users[$index]);
@@ -18,7 +18,8 @@ foreach ($users as $index => $user) {
     }
 }
 
-// Supprimer temporairement une bonne pratique
+
+// Temporarily delete a best practice
 if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
     $delete_id = $_POST['id'];
     $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 1 WHERE IDBonnePratique = :id");
@@ -129,7 +130,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                 $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
                 $program = isset($_GET['program']) ? $_GET['program'] : '';
                 $phase = isset($_GET['phase']) ? $_GET['phase'] : '';
-
+                // Prepare SQL query to get best practices based on search filters
                 $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
                         FROM PratiqueProg
                         INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
@@ -139,7 +140,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                         INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
                         INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique
                         WHERE BonnesPratiques.Etat = 0"; // Exclure les bonnes pratiques marquées comme supprimées
-
+                // Add filters to SQL query based on user input
                 if ($keyword !== '') {
                     $sql .= " AND BonnesPratiques.IDBonnePratique IN (
                         SELECT PratiqueMotsCles.IDBonnePratique
@@ -148,7 +149,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                         WHERE MotsCles.NomMotsCles = :keyword
                     )";
                 }
-
+                // Bind parameters to SQL query
                 if ($program !== '') {
                     $sql .= " AND BonnesPratiques.IDBonnePratique IN (
                         SELECT PratiqueProg.IDBonnePratique
@@ -173,10 +174,10 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                 if ($phase !== '') {
                     $stmt->bindValue(':phase', $phase);
                 }
-
+                // Execute the query
                 $stmt->execute();
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+                // Group results by best practice ID
                 $groupedResults = [];
                 foreach ($results as $row) {
                     $id = $row['IDBonnePratique'];
@@ -196,7 +197,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                         }
                     }
                 }
-
+                // Display the grouped results in the table
                 foreach ($groupedResults as $row) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomProgramme'])) . "</td>";

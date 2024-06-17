@@ -2,22 +2,22 @@
 session_start();
 include("../Database/base.php");
 
-
+// Check if 'username' key exists in the session
 if (!isset($_SESSION['username'])) {
-    
+     // Redirect the user to the login page if they are not logged in
     header("Location: login.php");
     exit;
 }
 
-$currentUsername = $_SESSION['username'];
+$currentUsername = $_SESSION['username'];// Get the current username from session
 
-
+// Retrieve all users from the database
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 
 
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+// Move the current user to the front of the list
 foreach ($users as $index => $user) {
     if ($user['NomUtilisateur'] === $currentUsername) {
         unset($users[$index]);
@@ -28,25 +28,27 @@ foreach ($users as $index => $user) {
 
 $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 
-
+// Retrieve all programs from the database
 $programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_COLUMN);
 
-
+// Handle form submission for restoring or permanently deleting a "bonne pratique"
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $id = $_POST['id'];
     $action = $_POST['action'];
     
     if ($action === 'restore') {
+       // Restore the "bonne pratique"
         $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 0 WHERE IDBonnePratique = :id");
         $query->execute([':id' => $id]);
     } elseif ($action === 'permanent_delete') {
+      // Permanently delete the "bonne pratique"
         $query = $bd->prepare("DELETE FROM BonnesPratiques WHERE IDBonnePratique = :id");
         $query->execute([':id' => $id]);
     }
 
-    
+     // Redirect to avoid resubmission
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -163,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           }
         }
 
-        
+        // Display grouped results in the table
         foreach ($groupedResults as $row) {
           $status = $row['Etat'] ? "<span style='color: red;'>Supprimé</span>" : "Actif";
           echo "<tr>";

@@ -2,20 +2,20 @@
 session_start();
 include("../Database/base.php");
 
-// Vérifier si l'utilisateur est connecté
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit;
 }
 
 $currentUsername = $_SESSION['username'];
-$userRole = $_SESSION['role']; // Assurez-vous que le rôle de l'utilisateur est stocké dans la session
+$userRole = $_SESSION['role']; // Ensure the user's role is stored in the session
 
-// Vérifier si l'ID de la bonne pratique à modifier est passé dans la requête
+// Check if the ID of the best practice to be modified is passed in the request
 if (isset($_POST['modify_id'])) {
     $id = $_POST['modify_id'];
 
-    // Vérifier si le formulaire a été soumis pour mettre à jour les détails
+    // Check if the form has been submitted to update the details
     if (isset($_POST['description'])) {
         $description = $_POST['description'];
         $keyword = $_POST['keyword'];
@@ -23,12 +23,12 @@ if (isset($_POST['modify_id'])) {
         $phase = $_POST['phase'];
 
         try {
-            // Mettre à jour la bonne pratique
+            // Update the best practice
             $stmt = $bd->prepare("UPDATE BonnesPratiques SET Description = :description WHERE IDBonnePratique = :id");
             $stmt->execute([':description' => $description, ':id' => $id]);
 
-            // Mettre à jour les mots clés, programmes et phase
-            // Suppression des entrées existantes
+            // Update keywords, programs, and phase
+            // Delete existing entries
             $stmt = $bd->prepare("DELETE FROM PratiqueMotsCles WHERE IDBonnePratique = :id");
             $stmt->execute([':id' => $id]);
             $stmt = $bd->prepare("DELETE FROM PratiqueProg WHERE IDBonnePratique = :id");
@@ -36,8 +36,8 @@ if (isset($_POST['modify_id'])) {
             $stmt = $bd->prepare("DELETE FROM PratiquePhases WHERE IDBonnePratique = :id");
             $stmt->execute([':id' => $id]);
 
-            // Ajout des nouvelles entrées
-            // Pour les mots clés, suppose que les mots clés sont séparés par des virgules
+            // Add new entries
+            // For keywords, assuming they are comma-separated
             $keywordsArray = explode(',', $keyword);
             foreach ($keywordsArray as $keyword) {
                 $stmt = $bd->prepare("SELECT IDMotsCles FROM MotsCles WHERE NomMotsCles = :keyword");
@@ -78,7 +78,7 @@ if (isset($_POST['modify_id'])) {
             echo "Error: " . $e->getMessage();
         }
     } else {
-        // Récupérer les détails de la bonne pratique à modifier
+        // Retrieve the details of the best practice to be modified
         $stmt = $bd->prepare("SELECT * FROM BonnesPratiques WHERE IDBonnePratique = :id");
         $stmt->execute([':id' => $id]);
         $bp = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -88,21 +88,21 @@ if (isset($_POST['modify_id'])) {
             exit;
         }
 
-        // Récupérer les mots clés associés à la bonne pratique
+        // Retrieve the keywords associated with the best practice
         $stmt = $bd->prepare("SELECT NomMotsCles FROM MotsCles 
                               INNER JOIN PratiqueMotsCles ON MotsCles.IDMotsCles = PratiqueMotsCles.IDMotsCles 
                               WHERE PratiqueMotsCles.IDBonnePratique = :id");
         $stmt->execute([':id' => $id]);
         $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        // Récupérer les programmes associés à la bonne pratique
+        // Retrieve the programs associated with the best practice
         $stmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes 
                               INNER JOIN PratiqueProg ON Programmes.IDProgramme = PratiqueProg.IDProgramme 
                               WHERE PratiqueProg.IDBonnePratique = :id");
         $stmt->execute([':id' => $id]);
         $programs = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        // Récupérer la phase associée à la bonne pratique
+        //  Retrieve the phase associated with the best practice
         $stmt = $bd->prepare("SELECT NomPhase FROM Phases 
                               INNER JOIN PratiquePhases ON Phases.IDPhase = PratiquePhases.IDPhase 
                               WHERE PratiquePhases.IDBonnePratique = :id");

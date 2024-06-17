@@ -148,6 +148,10 @@ th, td {
   display: none; /* Cache initialement le menu */
 }
 
+.superadmin {
+  color: red;
+  font-weight: bold; /* Optionnel, pour mettre en gras */
+}
 .menu-toggle:checked + .sidebar {
   display: block; /* Montre le menu quand la case est cochée */
 }

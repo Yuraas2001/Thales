@@ -43,7 +43,7 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
       border: 1px solid #ccc;
       padding: 10px;
       z-index: 1000;
-      width: 250px; /* Ajustez la largeur selon vos besoins */
+      width: 250px; 
       font-size: 12px;
     }
 </style>
@@ -77,9 +77,10 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 </style>
 <div class="content">
 <?php
+// Check if there is an error message in the session and display it
 if (isset($_SESSION['error'])) {
     echo "<p class='error'>" . $_SESSION['error'] . "</p>";
-    unset($_SESSION['error']);
+    unset($_SESSION['error']);// Remove the error message from the session
 }
 ?>
 

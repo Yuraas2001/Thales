@@ -4,7 +4,7 @@ include("../Database/base.php");
 
 $currentUsername = $_SESSION['username'];
 
-// Fonction pour obtenir les utilisateurs
+// Function to get users
 function getUsers($bd, $currentUsername) {
     $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
     $stmt->execute();
@@ -20,21 +20,21 @@ function getUsers($bd, $currentUsername) {
     return $users;
 }
 
-// Fonction pour obtenir les programmes
+// Function to get programs
 function getPrograms($bd) {
     $stmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// Fonction pour obtenir les phases
+// Function to get phases
 function getPhases($bd) {
     $stmt = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-// Fonction pour obtenir les résultats
+// Function to get results
 function getResults($bd, $keywords, $program, $phase) {
     $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
             FROM PratiqueProg
@@ -84,23 +84,23 @@ function getResults($bd, $keywords, $program, $phase) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Obtenir les utilisateurs
+// Get users
 $users = getUsers($bd, $currentUsername);
 
-// Obtenir les programmes
+// Get programs
 $programmes = getPrograms($bd);
 
-// Obtenir les phases
+// Get phases
 $phases = getPhases($bd);
 
-// Obtenir les résultats de la recherche
+// Get search results
 $keywords = isset($_GET['keyword']) ? $_GET['keyword'] : '';
 $program = isset($_GET['program']) ? $_GET['program'] : '';
 $phase = isset($_GET['phase']) ? $_GET['phase'] : '';
 
 $results = getResults($bd, $keywords, $program, $phase);
 
-// Grouper les résultats par IDBonnePratique
+// Group results by IDBonnePratique
 $groupedResults = [];
 foreach ($results as $row) {
     $id = $row['IDBonnePratique'];
@@ -197,14 +197,14 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
             <tbody>
                
                 <?php
-                // Vérification si une action de suppression est déclenchée
+              // Check if a delete action is triggered
                 if (isset($_POST['Etat'])) {
                     $delete_id = $_POST['Etat'];
                     $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 1 WHERE IDBonnePratique = :id");
                     $query->execute([':id' => $delete_id]);
                 }
 
-                // Ajoutez ce bloc de code à la place où vous générez chaque ligne de résultat dans le tableau
+                // Generate each result row in the table
                 foreach ($groupedResults as $row) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars(implode(", ", $row['NomProgramme'])) . "</td>";

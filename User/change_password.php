@@ -2,7 +2,7 @@
 session_start();
 include("../Database/base.php");
 
-// Vérifier si l'utilisateur est connecté
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
     exit;
@@ -11,46 +11,77 @@ if (!isset($_SESSION['username'])) {
 $currentUsername = $_SESSION['username'];
 $message = "";
 
-// Vérifier si le formulaire a été soumis
+// Retrieve password requirements
+$stmt = $bd->prepare("SELECT * FROM PasswordRequirements LIMIT 1");
+$stmt->execute();
+$requirements = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($requirements !== false) {
+    $n = $requirements['n']; // Number of numeric characters
+    $p = $requirements['p']; // Number of lowercase alphabetic characters
+    $q = $requirements['q']; // Number of uppercase alphabetic characters
+    $r = $requirements['r']; // Number of special characters
+} else {
+    $n = $p = $q = $r = 0;
+}
+
+// Check if the form was submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $oldPassword = $_POST['old_password'];
     $newPassword = $_POST['new_password'];
     $confirmPassword = $_POST['confirm_password'];
 
-    // Vérifier si les champs ne sont pas vides
+    // Check if the fields are not empty
     if (!empty($oldPassword) && !empty($newPassword) && !empty($confirmPassword)) {
-        // Vérifier si le nouveau mot de passe et la confirmation correspondent
+        // Check if the new password and confirmation match
         if ($newPassword === $confirmPassword) {
-            // Récupérer le mot de passe actuel de l'utilisateur
-            $stmt = $bd->prepare("SELECT MotDePasse FROM Utilisateurs WHERE NomUtilisateur = :username");
-            $stmt->execute([':username' => $currentUsername]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Validate the new password
+            function validatePassword($password, $n, $p, $q, $r) {
+                $number    = preg_match_all('@[0-9]@', $password) >= $n;
+                $lowercase = preg_match_all('@[a-z]@', $password) >= $p;
+                $uppercase = preg_match_all('@[A-Z]@', $password) >= $q;
+                $special   = preg_match_all('@[^\w]@', $password) >= $r;
 
-            if ($user) {
-                $storedPasswordHash = $user['MotDePasse'];
-                
-                // Si le mot de passe n'est pas haché, le hacher et le mettre à jour
-                if (!password_get_info($storedPasswordHash)['algo']) {
-                    $storedPasswordHash = password_hash($storedPasswordHash, PASSWORD_DEFAULT);
-                    $updateStmt = $bd->prepare("UPDATE Utilisateurs SET MotDePasse = :hashed_password WHERE NomUtilisateur = :username");
-                    $updateStmt->execute([':hashed_password' => $storedPasswordHash, ':username' => $currentUsername]);
+                if(!$number || !$lowercase || !$uppercase || !$special || strlen($password) < 8) {
+                    return false;
                 }
+                return true;
+            }
 
-                // Vérifier si l'ancien mot de passe correspond
-                if (password_verify($oldPassword, $storedPasswordHash)) {
-                    // Mettre à jour le mot de passe
-                    $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
-                    $stmt = $bd->prepare("UPDATE Utilisateurs SET MotDePasse = :new_password WHERE NomUtilisateur = :username");
-                    if ($stmt->execute([':new_password' => $newPasswordHash, ':username' => $currentUsername])) {
-                        $message = "Mot de passe modifié avec succès.";
+            if (!validatePassword($newPassword, $n, $p, $q, $r)) {
+                $message = "Le mot de passe doit contenir au moins $n caractères numériques, $p caractères alphabétiques minuscules, $q caractères alphabétiques majuscules et $r caractères spéciaux.";
+            } else {
+                // Retrieve the current password of the user
+                $stmt = $bd->prepare("SELECT MotDePasse FROM Utilisateurs WHERE NomUtilisateur = :username");
+                $stmt->execute([':username' => $currentUsername]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($user) {
+                    $storedPasswordHash = $user['MotDePasse'];
+                    
+                    // If the password is not hashed, hash it and update it
+                    if (!password_get_info($storedPasswordHash)['algo']) {
+                        $storedPasswordHash = password_hash($storedPasswordHash, PASSWORD_DEFAULT);
+                        $updateStmt = $bd->prepare("UPDATE Utilisateurs SET MotDePasse = :hashed_password WHERE NomUtilisateur = :username");
+                        $updateStmt->execute([':hashed_password' => $storedPasswordHash, ':username' => $currentUsername]);
+                    }
+
+                    // Check if the old password matches
+                    if (password_verify($oldPassword, $storedPasswordHash)) {
+                        // Update the password
+                        $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+                        $stmt = $bd->prepare("UPDATE Utilisateurs SET MotDePasse = :new_password WHERE NomUtilisateur = :username");
+                        if ($stmt->execute([':new_password' => $newPasswordHash, ':username' => $currentUsername])) {
+                            $message = "Mot de passe modifié avec succès.";
+                        } else {
+                            $message = "Erreur lors de la modification du mot de passe.";
+                        }
                     } else {
-                        $message = "Erreur lors de la modification du mot de passe.";
+                        $message = "Ancien mot de passe incorrect.";
                     }
                 } else {
-                    $message = "Ancien mot de passe incorrect.";
+                    $message = "Utilisateur non trouvé.";
                 }
-            } else {
-                $message = "Utilisateur non trouvé.";
             }
         } else {
             $message = "Les nouveaux mots de passe ne correspondent pas.";
@@ -100,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>Modifier le mot de passe</h1>
     </div>
     <?php if ($message): ?>
-        <p class="message"><?php echo htmlspecialchars($message); ?></p>
+        <p class="<?php echo strpos($message, 'succès') !== false ? 'message' : 'error-message'; ?>"><?php echo htmlspecialchars($message); ?></p>
     <?php endif; ?>
     <form action="change_password.php" method="post">
         <div class="form-group">
@@ -117,6 +148,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <button type="submit" class="btn">Modifier le mot de passe</button>
     </form>
+
+    <div class="requirements-container">
+        <h3>Exigences du mot de passe</h3>
+        <p>Nombre de caractères numériques : <?php echo $n; ?></p>
+        <p>Nombre de caractères alphabétiques minuscules : <?php echo $p; ?></p>
+        <p>Nombre de caractères alphabétiques majuscules : <?php echo $q; ?></p>
+        <p>Nombre de caractères spéciaux : <?php echo $r; ?></p>
+    </div>
 </div>
 </body>
 </html>

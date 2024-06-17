@@ -2,18 +2,19 @@
 session_start();
 include("../Database/base.php");
 include("../Database/helpers.php"); 
-
+// Check if 'username' key exists in the session
 if (!isset($_SESSION['username'])) {
+    // Redirect the user to the login page if they are not logged in
     header("Location: login.php");
     exit;
 }
 
 $currentUsername = $_SESSION['username'];
-
+// Prepare and execute the query to get user details
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+// Move the current user to the beginning of the users array
 foreach ($users as $index => $user) {
     if ($user['NomUtilisateur'] === $currentUsername) {
         unset($users[$index]);

@@ -83,7 +83,7 @@ $currentUsername = $_SESSION['username']; // Get the current username from sessi
                 <button type="button">Sélectionner les programmes</button>
                 <div class="dropdown-checkbox-content">
                     <?php
-                    // Récupérer tous les programmes existants sans doublons
+                    // Retrieve all existing programs without duplicates
                     $query = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
                     $query->execute();
                     $allPrograms = $query->fetchAll(PDO::FETCH_COLUMN);
@@ -102,12 +102,12 @@ $currentUsername = $_SESSION['username']; // Get the current username from sessi
             <label for="phase">Phase</label>
             <select id="phase" name="phase">
                 <?php
-                // Préparer la requête SQL pour obtenir les valeurs enum de 'NomPhase'
+                // Prepare the SQL query to get enum values of 'NomPhase'
                 $query = $bd->prepare("SHOW COLUMNS FROM Phases LIKE 'NomPhase'");
                 $query->execute();
                 $row = $query->fetch(PDO::FETCH_ASSOC);
 
-                // Extraire les valeurs enum
+                // Extract enum values
                 preg_match("/^enum\(\'(.*)\'\)$/", $row['Type'], $matches);
                 $enum = explode("','", $matches[1]);
 

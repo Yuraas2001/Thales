@@ -2,22 +2,22 @@
 session_start();
 include("../Database/base.php");
 
-
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    
+    // Redirect the user to the login page if they are not logged in
     header("Location: login.php");
     exit;
 }
 
-$currentUsername = $_SESSION['username'];
+$currentUsername = $_SESSION['username'];// Get the current username from session
 
-
+// Prepare and execute the query to get user details
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 
 
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+// Move the current user to the beginning of the users array
 foreach ($users as $index => $user) {
     if ($user['NomUtilisateur'] === $currentUsername) {
         unset($users[$index]);
@@ -28,25 +28,26 @@ foreach ($users as $index => $user) {
 
 $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 
-
+// Prepare and execute the query to get distinct program names
 $programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_COLUMN);
 
-
+// Handle form submission for actions like restore and permanent delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $id = $_POST['id'];
     $action = $_POST['action'];
-    
+    // Restore the best practice
     if ($action === 'restore') {
         $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 0 WHERE IDBonnePratique = :id");
         $query->execute([':id' => $id]);
     } elseif ($action === 'permanent_delete') {
+      // Permanently delete the best practice
         $query = $bd->prepare("DELETE FROM BonnesPratiques WHERE IDBonnePratique = :id");
         $query->execute([':id' => $id]);
     }
 
-    
+    // Redirect to the same page to refresh the data
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -69,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
     <div>
         <div class="user-menu">
-            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
+            <a href="./superadmin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
             <button class="user-button">☰</button>
             <div class="user-dropdown">
             <a href="./superadmin_changepassword.php">Modifier le mot de passe</a>
@@ -164,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           }
         }
 
-        
+        // Display the grouped results in the table
         foreach ($groupedResults as $row) {
           $status = $row['Etat'] ? "<span style='color: red;'>Supprimé</span>" : "Actif";
           echo "<tr>";

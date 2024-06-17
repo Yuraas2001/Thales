@@ -10,7 +10,7 @@ if (!isset($_SESSION['username'])) {
 }
 
 $currentUsername = $_SESSION['username']; // Get the current username from session
-
+// Handle deletion of "bonne pratique" (best practice)
 if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
     $bpId = $_POST['bp_id'];
     $query = $bd->prepare("UPDATE BonnesPratiques SET is_deleted = TRUE WHERE IDBonnePratique = :bp_id");
@@ -109,11 +109,13 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
             </thead>
             <tbody>
             <?php
+            // Get the search parameters from the GET request
             $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
             strpos($keyword, ',') !== false ? $keywords = explode(',', $keyword) : $keywords = [$keyword];
+            // Check if the keyword contains a comma, if so, split it into an array, otherwise create an array with a single keyword
             $program = isset($_GET['program']) ? $_GET['program'] : '';
             $phase = isset($_GET['phase']) ? $_GET['phase'] : '';
-
+            // Base SQL query to select best practices along with related program, phase, and keywords
             $sql = "SELECT BonnesPratiques.IDBonnePratique, Programmes.NomProgramme, Phases.NomPhase, BonnesPratiques.Description, MotsCles.NomMotsCles
                     FROM PratiqueProg
                     INNER JOIN Programmes ON PratiqueProg.IDProgramme = Programmes.IDProgramme
@@ -123,23 +125,26 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
                     INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
                     INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique
                     WHERE BonnesPratiques.Etat = FALSE";
-
+            // Initialize arrays to hold query conditions and parameters
             $conditions = [];
             $params = [];
-                   
+                   // Add condition and parameters for keywords if keyword is not empty
             if ($keyword !== '') {
+                // Create placeholders for each keyword in the array
                 $placeholders = implode(',', array_fill(0, count($keywords), '?'));
+               // Add condition to SQL query
                 $conditions[] = "BonnesPratiques.IDBonnePratique IN (
                                 SELECT PratiqueMotsCles.IDBonnePratique
                                 FROM PratiqueMotsCles
                                 INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
                                 WHERE MotsCles.NomMotsCles IN ($placeholders)
                             )";
+                // Add each keyword to parameters
                 foreach ($keywords as $word) {
                     $params[] = trim($word);
                 }
             }
-
+            // Add condition and parameter for program if program is not empty
             if ($program !== '') {
                 $conditions[] = "BonnesPratiques.IDBonnePratique IN (
                                 SELECT PratiqueProg.IDBonnePratique
@@ -149,28 +154,29 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
                             )";
                 $params[] = $program;
             }
-
+            // Add condition and parameter for phase if phase is not empty
             if ($phase !== '') {
                 $conditions[] = "Phases.NomPhase = ?";
                 $params[] = $phase;
             }
-
+            // Append conditions to SQL query if there are any
             if (!empty($conditions)) {
                 $sql .= ' AND ' . implode(' AND ', $conditions);
             }
-
+            // Add ordering to the SQL query
             $sql .= " ORDER BY FIELD(Phases.NomPhase, 'préparation', 'codage', 'exécution', 'analyse')";
-
+            // Prepare the SQL statement
             $stmt = $bd->prepare($sql);
-
+            // Bind the parameters to the SQL statement
             foreach ($params as $index => $param) {
                 $stmt->bindValue($index + 1, $param);
             }
-
+            // Execute the query
             $stmt->execute();
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+            // Initialize an array to hold grouped results
             $groupedResults = [];
+            // Group results by best practice ID
             foreach ($results as $row) {
                 $id = $row['IDBonnePratique'];
                 $program = $row['NomProgramme'];
@@ -189,7 +195,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
                     }
                 }
             }
-
+            // Display grouped results in the table
             foreach ($groupedResults as $row) {
                 echo "<tr>";
                 echo "<td>" . htmlspecialchars(implode(", ", $row['NomProgramme'])) . "</td>";
