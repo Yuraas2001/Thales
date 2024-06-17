@@ -1,4 +1,7 @@
 <?php
+session_start();
+$username = escapeshellarg($_SESSION['username']); // Escape the username for shell safety
+$keyword = isset($_POST['keyword']) && !empty($_POST['keyword']) ? escapeshellarg($_POST['keyword']) : '';
 $program = isset($_POST['program']) && !empty($_POST['program']) ? escapeshellarg($_POST['program']) : '';
 $phase = isset($_POST['phase']) && !empty($_POST['phase']) ? escapeshellarg($_POST['phase']) : '';
 $format = isset($_POST['format']) ? escapeshellarg($_POST['format']) : 'excel'; // Default to Excel if not set
