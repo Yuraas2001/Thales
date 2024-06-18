@@ -3,6 +3,12 @@ session_start();
 include("../Database/base.php");
 include("../Database/helpers.php"); 
 
+
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit;
+}
 $currentUsername = $_SESSION['username'];
 
 // Prepare and execute the query to get user details

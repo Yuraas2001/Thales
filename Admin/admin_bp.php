@@ -2,11 +2,10 @@
 session_start();
 include("../Database/base.php");
 
-// Check if 'username' key exists in the session
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-     // Redirect the user to the login page if they are not logged in
-    header("Location: login.php");
-    exit;
+  header("Location: ../index.php");
+  exit;
 }
 
 $currentUsername = $_SESSION['username'];// Get the current username from session

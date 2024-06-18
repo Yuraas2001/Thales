@@ -4,10 +4,9 @@ include("../Database/base.php");
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
+    header("Location: ../index.php");
     exit;
 }
-
 $currentUsername = $_SESSION['username'];
 $message = "";
 

@@ -2,6 +2,12 @@
 session_start();
 include("../Database/base.php");
 
+
+// Check if the user is logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit;
+}
 // Prepare and execute the SQL statement
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
