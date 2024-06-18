@@ -2,22 +2,22 @@
 session_start();
 include("../Database/base.php");
 
-// Check if 'username' key exists in the session
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-     // Redirect the user to the login page if they are not logged in
+    // Redirect the user to the login page if they are not logged in
     header("Location: login.php");
     exit;
 }
 
 $currentUsername = $_SESSION['username'];// Get the current username from session
 
-// Retrieve all users from the database
+// Prepare and execute the query to get user details
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 
 
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-// Move the current user to the front of the list
+// Move the current user to the beginning of the users array
 foreach ($users as $index => $user) {
     if ($user['NomUtilisateur'] === $currentUsername) {
         unset($users[$index]);
@@ -28,27 +28,26 @@ foreach ($users as $index => $user) {
 
 $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 
-// Retrieve all programs from the database
+// Prepare and execute the query to get distinct program names
 $programStmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes");
 $programStmt->execute();
 $programs = $programStmt->fetchAll(PDO::FETCH_COLUMN);
 
-// Handle form submission for restoring or permanently deleting a "bonne pratique"
+// Handle form submission for actions like restore and permanent delete
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $id = $_POST['id'];
     $action = $_POST['action'];
-    
+    // Restore the best practice
     if ($action === 'restore') {
-       // Restore the "bonne pratique"
         $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 0 WHERE IDBonnePratique = :id");
         $query->execute([':id' => $id]);
     } elseif ($action === 'permanent_delete') {
-      // Permanently delete the "bonne pratique"
+      // Permanently delete the best practice
         $query = $bd->prepare("DELETE FROM BonnesPratiques WHERE IDBonnePratique = :id");
         $query->execute([':id' => $id]);
     }
 
-     // Redirect to avoid resubmission
+    // Redirect to the same page to refresh the data
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -71,21 +70,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </div>
     <div>
         <div class="user-menu">
-            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
+            <a href="./superadmin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a>
             <button class="user-button">☰</button>
             <div class="user-dropdown">
-            <a href="./admin_changepassword.php">Modifier le mot de passe</a>
+            <a href="./superadmin_changepassword.php">Modifier le mot de passe</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
+
             </div>
         </div>
     </div>
 </nav>
 <div class="menu">
-    <a href="admin_users_list.php">Listes des utilisateurs</a>
-    <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
-    <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="admin_editprog.php">Modifier un programmee</a>
-    <a href="admin_addbp.php">Ajouter une bonne pratique</a>
+    <a href="superadmin_users_list.php">Listes des utilisateurs</a>
+    <a href="superadmin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
+    <a href="superadmin_editprog.php">Modifier un programmee</a>
+    <a href="superadmin_addbp.php">Ajouter une bonne pratique</a>
 </div>
 
 <div class="search-container">
@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           }
         }
 
-        // Display grouped results in the table
+        // Display the grouped results in the table
         foreach ($groupedResults as $row) {
           $status = $row['Etat'] ? "<span style='color: red;'>Supprimé</span>" : "Actif";
           echo "<tr>";
@@ -175,15 +175,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           echo "<td>" . htmlspecialchars(implode(", ", $row['NomMotsCles'])) . "</td>";
           echo "<td>" . $status . "</td>";
           echo "<td>
-                  <form method='post'>
-                      <input type='hidden' name='id' value='" . $row['IDBonnePratique'] . "'>
-                      " . ($row['Etat'] ? "<button type='submit' name='action' value='restore'>Restaurer</button>" : "") . "
-                      <button type='submit' name='action' value='permanent_delete'>Suppression Définitive</button>
-                  </form>
-                  <form method='post' action='modify1_bp.php' style='display:inline;'>
-                  <input type='hidden' name='modify1_id' value='" . $row['IDBonnePratique'] . "'>
-                  <button type='submit'>Modifier</button>
-              </form>
+          <form method='post' action='superadmin_modify.php' style='display:inline;'>
+          <input type='hidden' name='modify_id' value='" . $row['IDBonnePratique'] . "'>
+          <button type='submit'>Modifier</button>
+      </form>
+      <form method='post'>
+      <input type='hidden' name='id' value='" . $row['IDBonnePratique'] . "'>
+      " . ($row['Etat'] ? "<button type='submit' name='action' value='restore'>Restaurer</button>" : "") . "
+      <button type='submit' name='action' value='permanent_delete'>Suppression Définitive</button>
+  </form>
                 </td>";
           echo "</tr>";
         }

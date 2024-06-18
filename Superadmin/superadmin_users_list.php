@@ -43,7 +43,7 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
       border: 1px solid #ccc;
       padding: 10px;
       z-index: 1000;
-      width: 250px; /* Ajustez la largeur selon vos besoins */
+      width: 250px; 
       font-size: 12px;
     }
 </style>
@@ -60,10 +60,10 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
     </div>
     <div>
         <div class="user-menu">
-            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a> 
+            <a href="./superadmin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a> 
             <button class="user-button">☰</button>
             <div class="user-dropdown">
-            <a href="./admin_changepassword.php">Modifier le mot de passe</a>
+            <a href="./superadmin_changepassword.php">Modifier le mot de passe</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
             </div>
         </div>
@@ -77,9 +77,10 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 </style>
 <div class="content">
 <?php
+// Check if there is an error message in the session and display it
 if (isset($_SESSION['error'])) {
     echo "<p class='error'>" . $_SESSION['error'] . "</p>";
-    unset($_SESSION['error']);
+    unset($_SESSION['error']);// Remove the error message from the session
 }
 ?>
 
@@ -110,12 +111,13 @@ if ($requirements !== false) {
 </div>
 
 <div class="menu">
-    <a href="admin_users_list.php">Listes des utilisateurs</a>
-    <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
-    <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="admin_editprog.php">Modifier un programmee</a>
-    <a href="admin_addbp.php">Ajouter une bonne pratique</a>
+    <a href="superadmin_users_list.php">Listes des utilisateurs</a>
+    <a href="superadmin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
+    <a href="superadmin_editprog.php">Modifier un programmee</a>
+    <a href="superadmin_addbp.php">Ajouter une bonne pratique</a>
 </div>
+
 <h3>Ajouter un utilisateur</h3>
 <form action="../Database/add_user.php" method="post">
     <label for="username">Username:</label>

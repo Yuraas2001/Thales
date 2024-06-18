@@ -1,7 +1,7 @@
 <?php
 session_start();
 include("../Database/base.php");
-
+include("../Database/helpers.php"); 
 // Check if 'username' key exists in the session
 if (!isset($_SESSION['username'])) {
     // Redirect the user to the login page if they are not logged in
@@ -9,12 +9,12 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-$currentUsername = $_SESSION['username'];// Get the current username from session
-// Retrieve all users from the database
+$currentUsername = $_SESSION['username'];
+// Prepare and execute the query to get user details
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-// Move the current user to the front of the list
+// Move the current user to the beginning of the users array
 foreach ($users as $index => $user) {
     if ($user['NomUtilisateur'] === $currentUsername) {
         unset($users[$index]);
@@ -73,21 +73,21 @@ foreach ($users as $index => $user) {
     </div>
     <div>
         <div class="user-menu">
-            <a href="./admin_home.php" class="menu-button"><?php echo htmlspecialchars($currentUsername); ?></a> 
+        <a href="./superadmin_home.php" class="menu-button"><?php echo displayUsername($currentUsername, 'superadmin'); ?></a> 
             <button class="user-button">☰</button>
             <div class="user-dropdown">
-            <a href="./admin_changepassword.php">Modifier le mot de passe</a>
+            <a href="./superadmin_changepassword.php">Modifier le mot de passe</a>
                 <a href="../Database/deconnex.php">Se déconnecter</a>
             </div>
         </div>
     </div>
 </nav>
 <div class="menu">
-    <a href="admin_users_list.php">Listes des utilisateurs</a>
-    <a href="admin_banned_users.php">Modifier paramètres mot de passe</a>
-    <a href="admin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="admin_editprog.php">Modifier un programmee</a>
-    <a href="admin_addbp.php">Ajouter une bonne pratique</a>
+    <a href="superadmin_users_list.php">Listes des utilisateurs</a>
+    <a href="superadmin_banned_users.php">Modifier paramètres mot de passe</a>
+    <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
+    <a href="superadmin_editprog.php">Modifier un programmee</a>
+    <a href="superadmin_addbp.php">Ajouter une bonne pratique</a>
 </div>
 
 <?php

@@ -16,6 +16,9 @@
     <?php if (isset($_GET['err']) && $_GET['err'] == 2) { ?>
         <p style="color: red">Votre compte a été bloqué, contactez un Administrateur pour le déverouiller.</p>
     <?php } ?>
+    <?php if (isset($_GET['forgot_message'])) { ?>
+        <p style="color: red"><?php echo htmlspecialchars($_GET['forgot_message']); ?></p>
+    <?php } ?>
     <div class="login-container">
         <h2>Identifiez-vous</h2>
         <form method="POST" action="/Database/login.php">
@@ -28,10 +31,13 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" class="Login-bouton">Se connecter</button>
-            <div class="login-footer">
-                <a href="#">Mot de passe oublié ?</a>
-            </div>
         </form>
+        <div class="login-footer">
+            <form method="POST" action="/Database/forgot_password.php">
+                <input type="hidden" id="forgot_username" name="username">
+                <button type="submit" class="Login-bouton" onclick="document.getElementById('forgot_username').value = document.getElementById('username').value;">Mot de passe oublié ?</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
