@@ -69,21 +69,21 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
        <select name="program">
            <option value="">Programme</option>
            <?php foreach ($programmes as $programme): ?>
-               <option value="<?php echo $programme; ?>"><?php echo $programme; ?></option>
+               <option value="<?php echo htmlspecialchars($programme); ?>"><?php echo htmlspecialchars($programme); ?></option>
            <?php endforeach; ?>
        </select>
 
 
        <label for="phase">Phase</label>
        <?php
-       $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases ORDER BY FIELD(NomPhase, 'préparation', 'codage', 'exécution', 'analyse')");
+       $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases ORDER BY FIELD(NomPhase, 'codage', 'exécution', 'analyse', 'préparation')");
        $query->execute();
        $phases = $query->fetchAll(PDO::FETCH_COLUMN);
        ?>
        <select name="phase">
            <option value="">Phase</option>
            <?php foreach ($phases as $phase): ?>
-               <option value="<?php echo $phase; ?>"><?php echo $phase; ?></option>
+               <option value="<?php echo htmlspecialchars($phase); ?>"><?php echo htmlspecialchars($phase); ?></option>
            <?php endforeach; ?>
        </select>
 
@@ -168,7 +168,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
            }
 
 
-           $sql .= " ORDER BY FIELD(Phases.NomPhase, 'préparation', 'codage', 'exécution', 'analyse')";
+           $sql .= " ORDER BY FIELD(Phases.NomPhase, 'codage', 'exécution', 'analyse', 'préparation')";
 
 
            $stmt = $bd->prepare($sql);
@@ -224,7 +224,9 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
        // Récupérer les valeurs de l'URL (si disponibles)
        $keyword = isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '';
        $program = isset($_GET['program']) ? htmlspecialchars($_GET['program']) : '';
-       $phase = isset($_GET['phase']) ? htmlspecialchars($_GET['phase']) : '';
+       $phase = isset($_GET['phase'])
+
+ ? htmlspecialchars($_GET['phase']) : '';
        ?>
 
 
@@ -246,4 +248,3 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_bp') {
 </div>
 </body>
 </html>
-

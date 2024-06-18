@@ -3,7 +3,6 @@ session_start();
 include("../Database/base.php");
 include("../Database/helpers.php"); 
 
-
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: ../index.php");
@@ -23,7 +22,6 @@ foreach ($users as $index => $user) {
         break;
     }
 }
-
 
 // Temporarily delete a best practice
 if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
@@ -63,7 +61,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
     <a href="superadmin_users_list.php">Listes des utilisateurs</a>
     <a href="superadmin_banned_users.php">Modifier paramètres mot de passe</a>
     <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="superadmin_editprog.php">Modifier un programmee</a>
+    <a href="superadmin_editprog.php">Modifier un programme</a>
     <a href="superadmin_addbp.php">Ajouter une bonne pratique</a>
 </div>
 <style>
@@ -92,7 +90,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
 
         <label for="phase">Phase</label>
         <?php
-        $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases");
+        $query = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases ORDER BY FIELD(NomPhase, 'codage', 'exécution', 'analyse', 'préparation')");
         $query->execute();
         $phases = $query->fetchAll(PDO::FETCH_COLUMN);
         ?>
@@ -168,6 +166,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                 if ($phase !== '') {
                     $sql .= " AND Phases.NomPhase = :phase";
                 }
+
+                $sql .= " ORDER BY FIELD(Phases.NomPhase, 'codage', 'exécution', 'analyse', 'préparation')";
 
                 $stmt = $bd->prepare($sql);
 

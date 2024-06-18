@@ -35,7 +35,7 @@ function getPrograms($bd) {
 
 // Function to get phases
 function getPhases($bd) {
-    $stmt = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases");
+    $stmt = $bd->prepare("SELECT DISTINCT NomPhase FROM Phases ORDER BY FIELD(NomPhase, 'codage', 'exécution', 'analyse', 'préparation')");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
@@ -81,6 +81,8 @@ function getResults($bd, $keywords, $program, $phase) {
         $sql .= " AND Phases.NomPhase = :phase";
         $params[':phase'] = $phase;
     }
+
+    $sql .= " ORDER BY FIELD(Phases.NomPhase, 'codage', 'exécution', 'analyse', 'préparation')";
 
     $stmt = $bd->prepare($sql);
     foreach ($params as $key => &$val) {
@@ -203,7 +205,7 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
             <tbody>
                
                 <?php
-              // Check if a delete action is triggered
+                // Check if a delete action is triggered
                 if (isset($_POST['Etat'])) {
                     $delete_id = $_POST['Etat'];
                     $query = $bd->prepare("UPDATE BonnesPratiques SET Etat = 1 WHERE IDBonnePratique = :id");
@@ -236,7 +238,7 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
 </div>
 <div class="export-button">
     <form action="../Python/export.php" method="post">
-        <input type="hidden" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>">
+        <input type="hidden" name="keyword" value="<?php echo htmlspecialchars($keywords); ?>">
         <input type="hidden" name="program" value="<?php echo htmlspecialchars($program); ?>">
         <input type="hidden" name="phase" value="<?php echo htmlspecialchars($phase); ?>">
         

@@ -13,7 +13,6 @@ $currentUsername = $_SESSION['username'];// Get the current username from sessio
 $stmt = $bd->prepare("SELECT NomUtilisateur, TypeUtilisateur, Bloque FROM Utilisateurs");
 $stmt->execute();
 
-
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Move the current user to the beginning of the users array
 foreach ($users as $index => $user) {
@@ -82,12 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <a href="superadmin_users_list.php">Listes des utilisateurs</a>
     <a href="superadmin_banned_users.php">Modifier paramètres mot de passe</a>
     <a href="superadmin_bp.php">Gestion des bonnes pratiques</a>
-    <a href="superadmin_editprog.php">Modifier un programmee</a>
+    <a href="superadmin_editprog.php">Modifier un programme</a>
     <a href="superadmin_addbp.php">Ajouter une bonne pratique</a>
 </div>
 
 <div class="search-container">
-  <form action="admin_home.php" method="get">
+  <form action="superadmin_home.php" method="get">
     <input type="text" name="keyword" placeholder="Entrer un mot clé...">
     <select name="program">
         <option value="">Programme</option>
@@ -97,10 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     </select>
     <select name="phase">
         <option value="">Phase</option>
-        <option value="optionA">Codage</option>
-        <option value="optionB">Execution</option>
-        <option value="optionC">Analyse</option>
-        <option value="optionD">Préparation</option>
+        <option value="codage">Codage</option>
+        <option value="exécution">Exécution</option>
+        <option value="analyse">Analyse</option>
+        <option value="préparation">Préparation</option>
     </select>
     <button class="search-button">
         <i class="fa fa-search"></i> 
@@ -134,6 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
           INNER JOIN PratiqueMotsCles ON PratiqueProg.IDBonnePratique = PratiqueMotsCles.IDBonnePratique
           INNER JOIN MotsCles ON PratiqueMotsCles.IDMotsCles = MotsCles.IDMotsCles
           INNER JOIN BonnesPratiques ON PratiqueProg.IDBonnePratique = BonnesPratiques.IDBonnePratique
+          ORDER BY FIELD(Phases.NomPhase, 'codage', 'exécution', 'analyse', 'préparation')
         ");
 
        

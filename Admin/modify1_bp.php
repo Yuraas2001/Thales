@@ -4,9 +4,11 @@ include("../Database/base.php");
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: ../index.php");
+    // Redirect the user to the login page if they are not logged in
+    header("Location: login.php");
     exit;
 }
+
 $currentUsername = $_SESSION['username'];// Get the current username from session
 
 // Check if the ID of the best practice to be modified is passed in the request
@@ -23,60 +25,28 @@ if (isset($_POST['modify1_id'])) {
         exit;
     }
 
-    // If the best practice is not found, display an error message and exit
-    $stmt = $bd->prepare("SELECT NomMotsCles FROM MotsCles 
-                          INNER JOIN PratiqueMotsCles ON MotsCles.IDMotsCles = PratiqueMotsCles.IDMotsCles 
-                          WHERE PratiqueMotsCles.IDBonnePratique = :id");
-    $stmt->execute([':id' => $id]);
-    $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-    // Retrieve the keywords associated with the best practice
+    // Retrieve the programs associated with the best practice
     $stmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes 
                           INNER JOIN PratiqueProg ON Programmes.IDProgramme = PratiqueProg.IDProgramme 
                           WHERE PratiqueProg.IDBonnePratique = :id");
     $stmt->execute([':id' => $id]);
     $programs = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Retrieve the programs associated with the best practice
-    $stmt = $bd->prepare("SELECT NomPhase FROM Phases 
-                          INNER JOIN PratiquePhases ON Phases.IDPhase = PratiquePhases.IDPhase 
-                          WHERE PratiquePhases.IDBonnePratique = :id");
-    $stmt->execute([':id' => $id]);
-    $phase = $stmt->fetchColumn();
-
-     // Check if the form has been submitted to update the details
+    // Check if the form has been submitted to update the details
     if (isset($_POST['description'])) {
         $description = $_POST['description'];
-        $keyword = $_POST['keyword'];
         $programs = isset($_POST['program']) ? $_POST['program'] : [];
-        $phase = $_POST['phase'];
 
         // Update the best practice description
         $stmt = $bd->prepare("UPDATE BonnesPratiques SET Description = :description WHERE IDBonnePratique = :id");
         $stmt->execute([':description' => $description, ':id' => $id]);
 
-        // Update the keywords, programs, and phase
+        // Update the programs
         // Delete existing entries
-        $stmt = $bd->prepare("DELETE FROM PratiqueMotsCles WHERE IDBonnePratique = :id");
-        $stmt->execute([':id' => $id]);
         $stmt = $bd->prepare("DELETE FROM PratiqueProg WHERE IDBonnePratique = :id");
-        $stmt->execute([':id' => $id]);
-        $stmt = $bd->prepare("DELETE FROM PratiquePhases WHERE IDBonnePratique = :id");
         $stmt->execute([':id' => $id]);
 
         // Add new entries
-        // For keywords, assume keywords are separated by commas
-        $keywordsArray = explode(',', $keyword);
-        foreach ($keywordsArray as $keyword) {
-            $stmt = $bd->prepare("SELECT IDMotsCles FROM MotsCles WHERE NomMotsCles = :keyword");
-            $stmt->execute([':keyword' => trim($keyword)]);
-            $keywordId = $stmt->fetchColumn();
-            if ($keywordId) {
-                $stmt = $bd->prepare("INSERT INTO PratiqueMotsCles (IDBonnePratique, IDMotsCles) VALUES (:id, :keywordId)");
-                $stmt->execute([':id' => $id, ':keywordId' => $keywordId]);
-            }
-        }
-        // Update programs
         foreach ($programs as $program) {
             $stmt = $bd->prepare("SELECT IDProgramme FROM Programmes WHERE NomProgramme = :program");
             $stmt->execute([':program' => $program]);
@@ -85,14 +55,6 @@ if (isset($_POST['modify1_id'])) {
                 $stmt = $bd->prepare("INSERT INTO PratiqueProg (IDBonnePratique, IDProgramme) VALUES (:id, :programId)");
                 $stmt->execute([':id' => $id, ':programId' => $programId]);
             }
-        }
-         // Update phase
-        $stmt = $bd->prepare("SELECT IDPhase FROM Phases WHERE NomPhase = :phase");
-        $stmt->execute([':phase' => $phase]);
-        $phaseId = $stmt->fetchColumn();
-        if ($phaseId) {
-            $stmt = $bd->prepare("INSERT INTO PratiquePhases (IDBonnePratique, IDPhase) VALUES (:id, :phaseId)");
-            $stmt->execute([':id' => $id, ':phaseId' => $phaseId]);
         }
 
         // Redirect to user home page after successful update
@@ -168,11 +130,6 @@ if (isset($_POST['modify1_id'])) {
         </div>
 
         <div class="form-group">
-            <label for="keyword">Mot(s) clé(s)</label>
-            <input type="text" id="keyword" name="keyword" value="<?php echo htmlspecialchars(implode(", ", $keywords)); ?>">
-        </div>
-
-        <div class="form-group">
             <label for="program">Programme</label>
             <div class="dropdown-checkbox">
                 <button type="button">Sélectionner les programmes</button>
@@ -191,25 +148,6 @@ if (isset($_POST['modify1_id'])) {
                     <?php endforeach; ?>
                 </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label for="phase">Phase</label>
-            <select id="phase" name="phase">
-                <?php
-                // Prepare the SQL query to get enum values of 'NomPhase
-                $query = $bd->prepare("SHOW COLUMNS FROM Phases LIKE 'NomPhase'");
-                $query->execute();
-                $row = $query->fetch(PDO::FETCH_ASSOC);
-
-                // Extract enum values
-                preg_match("/^enum\(\'(.*)\'\)$/", $row['Type'], $matches);
-                $enum = explode("','", $matches[1]);
-                // Loop through each enum value and create an option element for the select dropdown
-                foreach ($enum as $phaseOption): ?>
-                    <option value="<?php echo htmlspecialchars($phaseOption); ?>" <?php echo $phaseOption == $phase ? 'selected' : ''; ?>><?php echo htmlspecialchars($phaseOption); ?></option>
-                <?php endforeach; ?>
-            </select>
         </div>
 
         <button type="submit" class="btn">Enregistrer</button>

@@ -24,7 +24,7 @@ if (isset($_POST['username'])) {// Check if the username is set in the POST requ
         exit;
     } else {
          // If the user does not exist, redirect with an error message
-        header("Location: /index.php?forgot_message=" . urlencode("Utilisateur non trouvé."));
+        header("Location: /index.php?forgot_message=" . urlencode("Veuillez saisir un nom d'utilisateur."));
         exit;
     }
 } else {

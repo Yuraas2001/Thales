@@ -17,37 +17,19 @@ if (isset($_POST['modify_id'])) {
     // Check if the form has been submitted to update the details
     if (isset($_POST['description'])) {
         $description = $_POST['description'];
-        $keyword = $_POST['keyword'];
         $programs = isset($_POST['program']) ? $_POST['program'] : [];
-        $phase = $_POST['phase'];
 
         try {
             // Update the best practice description
             $stmt = $bd->prepare("UPDATE BonnesPratiques SET Description = :description WHERE IDBonnePratique = :id");
             $stmt->execute([':description' => $description, ':id' => $id]);
 
-            // Update the keywords, programs, and phase
+            // Update programs
             // Delete existing entries
-            $stmt = $bd->prepare("DELETE FROM PratiqueMotsCles WHERE IDBonnePratique = :id");
-            $stmt->execute([':id' => $id]);
             $stmt = $bd->prepare("DELETE FROM PratiqueProg WHERE IDBonnePratique = :id");
-            $stmt->execute([':id' => $id]);
-            $stmt = $bd->prepare("DELETE FROM PratiquePhases WHERE IDBonnePratique = :id");
             $stmt->execute([':id' => $id]);
 
             // Add new entries
-            // For keywords, assume they are separated by commas
-            $keywordsArray = explode(',', $keyword);
-            foreach ($keywordsArray as $keyword) {
-                $stmt = $bd->prepare("SELECT IDMotsCles FROM MotsCles WHERE NomMotsCles = :keyword");
-                $stmt->execute([':keyword' => trim($keyword)]);
-                $keywordId = $stmt->fetchColumn();
-                if ($keywordId) {
-                    $stmt = $bd->prepare("INSERT INTO PratiqueMotsCles (IDBonnePratique, IDMotsCles) VALUES (:id, :keywordId)");
-                    $stmt->execute([':id' => $id, ':keywordId' => $keywordId]);
-                }
-            }
-
             foreach ($programs as $program) {
                 $stmt = $bd->prepare("SELECT IDProgramme FROM Programmes WHERE NomProgramme = :program");
                 $stmt->execute([':program' => $program]);
@@ -56,14 +38,6 @@ if (isset($_POST['modify_id'])) {
                     $stmt = $bd->prepare("INSERT INTO PratiqueProg (IDBonnePratique, IDProgramme) VALUES (:id, :programId)");
                     $stmt->execute([':id' => $id, ':programId' => $programId]);
                 }
-            }
-
-            $stmt = $bd->prepare("SELECT IDPhase FROM Phases WHERE NomPhase = :phase");
-            $stmt->execute([':phase' => $phase]);
-            $phaseId = $stmt->fetchColumn();
-            if ($phaseId) {
-                $stmt = $bd->prepare("INSERT INTO PratiquePhases (IDBonnePratique, IDPhase) VALUES (:id, :phaseId)");
-                $stmt->execute([':id' => $id, ':phaseId' => $phaseId]);
             }
 
             // Redirect to superadmin_bp.php after successful update
@@ -83,27 +57,12 @@ if (isset($_POST['modify_id'])) {
             exit;
         }
 
-        // Retrieve the keywords associated with the best practice
-        $stmt = $bd->prepare("SELECT NomMotsCles FROM MotsCles 
-                              INNER JOIN PratiqueMotsCles ON MotsCles.IDMotsCles = PratiqueMotsCles.IDMotsCles 
-                              WHERE PratiqueMotsCles.IDBonnePratique = :id");
-        $stmt->execute([':id' => $id]);
-        $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
         // Retrieve the programs associated with the best practice
         $stmt = $bd->prepare("SELECT DISTINCT NomProgramme FROM Programmes 
                               INNER JOIN PratiqueProg ON Programmes.IDProgramme = PratiqueProg.IDProgramme 
                               WHERE PratiqueProg.IDBonnePratique = :id");
         $stmt->execute([':id' => $id]);
         $programs = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-        
-        // Retrieve the phase associated with the best practice
-        $stmt = $bd->prepare("SELECT NomPhase FROM Phases 
-                              INNER JOIN PratiquePhases ON Phases.IDPhase = PratiquePhases.IDPhase 
-                              WHERE PratiquePhases.IDBonnePratique = :id");
-        $stmt->execute([':id' => $id]);
-        $phase = $stmt->fetchColumn();
     }
 } else {
     echo "ID de la bonne pratique manquant.";
@@ -175,11 +134,6 @@ if (isset($_POST['modify_id'])) {
         </div>
 
         <div class="form-group">
-            <label for="keyword">Mot(s) clé(s)</label>
-            <input type="text" id="keyword" name="keyword" value="<?php echo htmlspecialchars(implode(", ", $keywords)); ?>">
-        </div>
-
-        <div class="form-group">
             <label for="program">Programme</label>
             <div class="dropdown-checkbox">
                 <button type="button">Sélectionner les programmes</button>
@@ -198,25 +152,6 @@ if (isset($_POST['modify_id'])) {
                     <?php endforeach; ?>
                 </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label for="phase">Phase</label>
-            <select id="phase" name="phase">
-                <?php
-                /// Prepare the SQL query to get the enum values of 'NomPhase'
-                $query = $bd->prepare("SHOW COLUMNS FROM Phases LIKE 'NomPhase'");
-                $query->execute();
-                $row = $query->fetch(PDO::FETCH_ASSOC);
-
-                // Extract the variables
-                preg_match("/^enum\(\'(.*)\'\)$/", $row['Type'], $matches);
-                $enum = explode("','", $matches[1]);
-
-                foreach ($enum as $phaseOption): ?>
-                    <option value="<?php echo htmlspecialchars($phaseOption); ?>" <?php echo $phaseOption == $phase ? 'selected' : ''; ?>><?php echo htmlspecialchars($phaseOption); ?></option>
-                <?php endforeach; ?>
-            </select>
         </div>
 
         <button type="submit" class="btn">Enregistrer</button>

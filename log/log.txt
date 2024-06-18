@@ -1,0 +1,42 @@
+::1	2024-06-05 00:16:48	Information	Entrée de test dans le journal
+::1	2024-06-05 00:16:48	Information	Test de la fonction de journalisation.
+::1	2024-06-05 00:16:49	Information	Entrée de test dans le journal
+::1	2024-06-05 00:16:49	Information	Test de la fonction de journalisation.
+::1	2024-06-05 00:26:33	Information	Entrée de test dans le journal
+::1	2024-06-05 00:26:33	Information	Test de la fonction de journalisation.
+::1	2024-06-05 00:26:34	Information	Entrée de test dans le journal
+::1	2024-06-05 00:26:34	Information	Test de la fonction de journalisation.
+::1	2024-06-05 00:26:34	Information	Entrée de test dans le journal
+::1	2024-06-05 00:26:34	Information	Test de la fonction de journalisation.
+::1	2024-06-05 00:28:32	Warning	La connexion à la base de données a échoué.
+::1	2024-06-05 00:28:35	Warning	La connexion à la base de données a échoué.
+::1	2024-06-05 00:48:06	Warning	La connexion à la base de données a échoué.
+::1	2024-06-05 00:48:08	Warning	La connexion à la base de données a échoué.
+::1	2024-06-05 00:50:23	Warning	La connexion à la base de données a échoué.
+::1	2024-06-05 00:50:24	Warning	La connexion à la base de données a échoué.
+::1	2024-06-05 00:50:40	Warning	La connexion à la base de données a échoué.
+::1	2024-06-05 00:50:41	Warning	La connexion à la base de données a échoué.
+::1	2024-06-05 00:58:31	warning	db_connection_failed	Username: Unknown User	Profile: Unknown Profile
+::1	2024-06-05 01:02:06	warning	db_connection_failed	Username: Unknown User	Profile: Unknown Profile
+::1	2024-06-05 01:02:18	warning	db_connection_failed	Username: Unknown User	Profile: Unknown Profile
+::1	2024-06-05 01:02:19	warning	db_connection_failed	Username: Unknown User	Profile: Unknown Profile
+::1	Unknown User	Unknown Profile	2024-06-05 01:03:24	warning	db_connection_failed
+::1	Unknown User	Unknown Profile	2024-06-05 01:03:25	warning	db_connection_failed
+::1	Unknown User	Unknown Profile		2024-06-05 01:04:29	warning	db_connection_failed
+::1	Unknown User	Unknown Profile		05-06-2024 01:08:38	warning	db_connection_failed
+::1	Unknown User	Unknown Profile		07-06-2024 11:17:45	warning	db_connection_failed
+::1	Unknown User	Unknown Profile		07-06-2024 11:46:12	warning	db_connection_failed
+::1	khawla	Unknown Profile		10-06-2024 16:05:38	warning	db_connection_failed
+::1	Username: khawla		10-06-2024 16:24:13	warning	db_connection_failed
+::1	Username: khawla		10-06-2024 16:28:46	warning:	db_connection_failed
+::1	Username: khawla		10-06-2024 16:30:51	warning:	db_connection_failed
+::1	Username: khawla		10-06-2024 16:30:53	warning:	db_connection_failed
+::1	Username: khawla		10-06-2024 16:36:18	warning:db_connection_failed
+::1	Username: khawla		10-06-2024 16:37:50	warning: db_connection_failed
+::1	Utilisateur: khawla		17-06-2024 23:56:56	warning: db_connection_failed
+::1	Utilisateur: khawla		18-06-2024 00:06:11	Alarme: Mot de passe oublié, compte utilisateur bloqué.
+::1	Utilisateur: khawla		18-06-2024 00:06:11	Avertissement: Mot de passe incorrect.
+::1	Utilisateur: khawla		18-06-2024 00:06:11	Information: Exportation en PDF ou CSV effectuée.
+::1	Utilisateur: khawla		18-06-2024 00:31:06	Alarme: Mot de passe oublié, compte utilisateur bloqué.
+::1	Utilisateur: khawla		18-06-2024 00:31:06	Avertissement: Mot de passe incorrect.
+::1	Utilisateur: khawla		18-06-2024 00:31:06	Information: Exportation en PDF ou CSV effectuée.
