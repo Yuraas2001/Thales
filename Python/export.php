@@ -1,10 +1,11 @@
 <?php
 session_start();
-$username = escapeshellarg($_SESSION['username']); // Escape the username for shell safety
+$username = isset($_POST['username']) && !empty($_POST['username']) ? escapeshellarg($_POST['username']) : 'Guest';
 $keyword = isset($_POST['keyword']) && !empty($_POST['keyword']) ? escapeshellarg($_POST['keyword']) : '';
 $program = isset($_POST['program']) && !empty($_POST['program']) ? escapeshellarg($_POST['program']) : '';
 $phase = isset($_POST['phase']) && !empty($_POST['phase']) ? escapeshellarg($_POST['phase']) : '';
-$format = isset($_POST['format']) ? escapeshellarg($_POST['format']) : 'excel'; // Default to Excel if not set
+$format = isset($_POST['format']) ? escapeshellarg($_POST['format']) : 'PDF'; // Default to Excel if not set
+$role=$_POST['role'];
 
 
 // Construct the command with required parameters
@@ -26,28 +27,34 @@ if (!empty($phase)) {
 
 $command .= " -f $format 2>&1";
 
-
-// Display the command for debugging purposes
-echo "Command : $command\n";
-
-
 // Execute the command and capture both output and exit status
 $output = [];
 $status = -1;
 exec($command, $output, $status);
 
-
-
-
 // Check if the command executed successfully
 if ($status === 0) {
-   $_SESSION['export_status'] = "Export generated successfully.";
+    if ($role == 1) {
+        header('Location: http://localhost/Admin/admin_home.php?res=1');
+        exit();
+    } elseif ($role == 0) {
+        header('Location: http://localhost/User/user_home.php?res=1');
+        exit();
+    } elseif ($role == 2) {
+        header('Location: http://localhost/Superadmin/superadmin_home.php?res=1');
+        exit();
+    }
 } else {
-   $_SESSION['export_status'] = "An error occurred while generating the export.";
+    if ($role == 1) {
+        header('Location: http://localhost/Admin/admin_home.php?res=0');
+        exit();
+    } elseif ($role == 0) {
+        header('Location: http://localhost/User/user_home.php?res=0');
+        exit();
+    } elseif ($role == 2) {
+        header('Location: http://localhost/Superadmin/superadmin_home.php?res=0');
+        exit();
+    }
 }
 
-
-// Redirect back to the page with the form
-header("Location: ../Admin/admin_home.php");
-exit;
-?>
+exit();

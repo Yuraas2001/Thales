@@ -191,9 +191,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
   </div>
 </div>
 
-<div class="export-button">
-    <button class="button primary">Exporter le Tableau</button>
-</div>
 
 </body>
 </html>

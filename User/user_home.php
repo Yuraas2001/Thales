@@ -188,7 +188,13 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
         <i class="fa fa-refresh"></i> 
     </a>
 </div>
+<?php if (isset($_GET['res']) && $_GET['res'] == 0) { ?>
+    <p style="color: green; text-align: center;">Oupss : Erreur dans l'exportation du Tableau</p>
+<?php } ?>
 
+<?php if (isset($_GET['res']) && $_GET['res'] == 1) { ?>
+    <p style="color: green; text-align: center;">Bingooo !! Le Tableau a bien été exporté</p>
+<?php } ?>
 <div class="container">
     <h2 class="results-title">Résultats</h2>
     <div class="table-container">
@@ -237,12 +243,22 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
     </div>
 </div>
 <div class="export-button">
-    <form action="../Python/export.php" method="post">
-        <input type="hidden" name="keyword" value="<?php echo htmlspecialchars($keywords); ?>">
-        <input type="hidden" name="program" value="<?php echo htmlspecialchars($program); ?>">
-        <input type="hidden" name="phase" value="<?php echo htmlspecialchars($phase); ?>">
+    <form action="./Python/export.php" method="POST">
+        <?php
+        // Récupérer les valeurs de l'URL (si disponibles)
+        $keyword = isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '';
+        $program = isset($_GET['program']) ? htmlspecialchars($_GET['program']) : '';
+        $phase = isset($_GET['phase']) ? htmlspecialchars($_GET['phase']) : '';
+        $currentUsername = $_SESSION['username'];
+        $role = $_SESSION['role'];
+        ?>
+        <input type="hidden" name="keyword" value="<?php echo $keyword; ?>">
+        <input type="hidden" name="program" value="<?php echo $program; ?>">
+        <input type="hidden" name="phase" value="<?php echo $phase; ?>">
+        <input type="hidden" name="username" value="<?php echo $currentUsername; ?>">
+        <input type="hidden" name="role" value="<?php echo $role; ?>">
         
-        <label for="format">Format:</label>
+        <label for="format">Format :</label>
         <select name="format" id="format">
             <option value="Excel">CSV</option>
             <option value="PDF">PDF</option>
@@ -251,6 +267,7 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
         <button type="submit" class="button primary">Exporter le Tableau</button>
     </form>
 </div>
+
 
 </body>
 </html>
