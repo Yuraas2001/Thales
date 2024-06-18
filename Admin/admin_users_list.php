@@ -160,26 +160,26 @@ if ($requirements !== false) {
                             <!-- The Modifier button -->
                             <a href="?edit=<?php echo urlencode($user['NomUtilisateur']); ?>">Modifier</a>
 
-                            <?php
-                            if (isset($_GET['edit']) && $_GET['edit'] == $user['NomUtilisateur']) {
+                             <?php
+                                if (isset($_GET['edit']) && $_GET['edit'] == $user['NomUtilisateur']) {
+                                    ?>
+                                    <form action="../Database/change_role_password.php" method="post">
+                                        <input type="hidden" name="username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
+
+                                        <label for="new_password">New Password:</label>
+                                        <input type="password" id="new_password" name="new_password" required>
+
+                                        <label for="new_role">New Role:</label>
+                                        <select id="new_role" name="new_role">
+                                            <option value="0" <?php echo $user['TypeUtilisateur'] == 'User' ? 'selected' : ''; ?>>User</option>
+                                            <option value="1" <?php echo $user['TypeUtilisateur'] == 'Admin' ? 'selected' : ''; ?>>Admin</option>
+                                        </select>
+
+                                        <input type="submit" value="Change Role & Password">
+                                    </form>
+                                    <?php
+                                }
                                 ?>
-                                <form action="../Database/change_role.php" method="post">
-                                    <input type="hidden" name="old_username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
-
-                                    <label for="new_username">New Username:</label>
-                                    <input type="text" id="new_username" name="new_username" value="<?php echo htmlspecialchars($user['NomUtilisateur']); ?>">
-
-                                    <label for="new_role">New Role:</label>
-                                    <select id="new_role" name="new_role">
-                                        <option value="0" <?php echo $user['TypeUtilisateur'] == 'User' ? 'selected' : ''; ?>>User</option>
-                                        <option value="1" <?php echo $user['TypeUtilisateur'] == 'Admin' ? 'selected' : ''; ?>>Admin</option>
-                                    </select>
-
-                                    <input type="submit" value="Modifier">
-                                </form>
-                                <?php
-                            }
-                            ?>
                             <?php if ($user['Bloque'] == 1): ?>
                                 <?php if (isset($_GET['unblock']) && $_GET['unblock'] === $user['NomUtilisateur']): ?>
                                     <!-- Unblock User form -->
