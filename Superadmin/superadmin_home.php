@@ -131,10 +131,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete_practice') {
                         </tr>
                 </thead>
                 <tbody>
-    <div class="export-button">
-  <a href="export_pdf.php" class="button primary">Exporter en PDF</a>
-  <a href="export_excel.php" class="button primary">Exporter en Excel</a>
-</div>
+   
                 <?php
 
                 $keyword = isset($_GET['keyword']) ? $_GET['keyword'] : '';
