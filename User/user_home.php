@@ -189,7 +189,7 @@ $usernameToModify = isset($_GET['modify']) ? $_GET['modify'] : null;
     </a>
 </div>
 <?php if (isset($_GET['res']) && $_GET['res'] == 0) { ?>
-    <p style="color: green; text-align: center;">Oupss : Erreur dans l'exportation du Tableau</p>
+    <p style="color: red; text-align: center;">Oupss : Erreur dans l'exportation du Tableau</p>
 <?php } ?>
 
 <?php if (isset($_GET['res']) && $_GET['res'] == 1) { ?>
